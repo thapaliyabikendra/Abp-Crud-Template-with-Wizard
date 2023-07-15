@@ -10,13 +10,12 @@ namespace AbpCrudTemplate
             InitializeComponent();
         }
         public string PluralEntityName { get; set; }
-        public string MicroServiceName { get; set; }
-        public bool IsMultiTenant { get; set; } = false;
+        public string AppName { get; set; }
         public string Properties { get; set; }
         private void btnOk_Click(object sender, EventArgs e)
         {
             this.PluralEntityName = txtPluralEntityName.Text;
-            this.MicroServiceName = txtMicroServiceName.Text;
+            this.AppName = txtAppName.Text;
             this.Properties = txtProperties.Text;
             this.Close();
         }

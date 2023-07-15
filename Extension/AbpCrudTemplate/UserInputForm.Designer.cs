@@ -32,7 +32,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txtPluralEntityName = new System.Windows.Forms.TextBox();
-            this.txtMicroServiceName = new System.Windows.Forms.TextBox();
+            this.txtAppName = new System.Windows.Forms.TextBox();
             this.txtProperties = new System.Windows.Forms.TextBox();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -41,7 +41,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(76, 55);
+            this.label1.Location = new System.Drawing.Point(76, 116);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(119, 16);
             this.label1.TabIndex = 0;
@@ -50,11 +50,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(76, 95);
+            this.label2.Location = new System.Drawing.Point(76, 56);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(129, 16);
+            this.label2.Size = new System.Drawing.Size(75, 16);
             this.label2.TabIndex = 1;
-            this.label2.Text = "MicroService Name:";
+            this.label2.Text = "App Name:";
             // 
             // label4
             // 
@@ -67,17 +67,17 @@
             // 
             // txtPluralEntityName
             // 
-            this.txtPluralEntityName.Location = new System.Drawing.Point(246, 55);
+            this.txtPluralEntityName.Location = new System.Drawing.Point(246, 116);
             this.txtPluralEntityName.Name = "txtPluralEntityName";
             this.txtPluralEntityName.Size = new System.Drawing.Size(366, 22);
             this.txtPluralEntityName.TabIndex = 4;
             // 
-            // txtMicroServiceName
+            // txtAppName
             // 
-            this.txtMicroServiceName.Location = new System.Drawing.Point(246, 95);
-            this.txtMicroServiceName.Name = "txtMicroServiceName";
-            this.txtMicroServiceName.Size = new System.Drawing.Size(366, 22);
-            this.txtMicroServiceName.TabIndex = 5;
+            this.txtAppName.Location = new System.Drawing.Point(246, 56);
+            this.txtAppName.Name = "txtAppName";
+            this.txtAppName.Size = new System.Drawing.Size(366, 22);
+            this.txtAppName.TabIndex = 5;
             // 
             // txtProperties
             // 
@@ -117,7 +117,7 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.txtProperties);
-            this.Controls.Add(this.txtMicroServiceName);
+            this.Controls.Add(this.txtAppName);
             this.Controls.Add(this.txtPluralEntityName);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
@@ -135,7 +135,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtPluralEntityName;
-        private System.Windows.Forms.TextBox txtMicroServiceName;
+        private System.Windows.Forms.TextBox txtAppName;
         private System.Windows.Forms.TextBox txtProperties;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;

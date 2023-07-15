@@ -13,6 +13,9 @@ namespace AbpCrudTemplate
 {
     public class WizardImplementation : IWizard
     {
+        private UserInputForm _inputForm;
+        private bool _addProjectItem = true;
+
         public void BeforeOpeningFile(ProjectItem projectItem)
         {
         }
@@ -28,104 +31,92 @@ namespace AbpCrudTemplate
         public void RunFinished()
         {
         }
-        public UserInputForm _inputForm;
-        public bool AddPItem { get; set; } = true;
+
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             try
             {
-                // Display a form to the user. The form collects 
-                // input for the custom message.
+                // Display a form to the user. The form collects input for the custom message.
                 _inputForm = new UserInputForm();
                 if (_inputForm.ShowDialog() != DialogResult.OK)
                 {
-                    AddPItem = false;
+                    _addProjectItem = false;
                     return;
                 }
 
-                ItemTemplate itemTemplate = new ItemTemplate()
+                var safeItemName = replacementsDictionary["$safeitemname$"];
+                if (string.IsNullOrWhiteSpace(_inputForm.PluralEntityName))
+                {
+                    _inputForm.PluralEntityName = safeItemName;
+                }
+
+                var itemTemplate = new ItemTemplate
                 {
                     SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
                     RootNamespace = replacementsDictionary["$rootnamespace$"],
-                    SafeItemName = replacementsDictionary["$safeitemname$"],
-                    ServiceName = _inputForm.MicroServiceName,
+                    AppName = _inputForm.AppName,
+                    AppNameCamelCase = ToCamelCase(_inputForm.AppName),
+                    SafeItemName = safeItemName,
+                    PluralEntityName = _inputForm.PluralEntityName,
+                    EntityCamelCase = ToCamelCase(safeItemName)
                 };
 
-                StringBuilder properties = new StringBuilder();
-                StringBuilder createupdateproperties = new StringBuilder();
-                StringBuilder dtoproperties = new StringBuilder();
-                StringBuilder filterproperties = new StringBuilder();
+                var properties = new StringBuilder();
+                var createUpdateProperties = new StringBuilder();
+                var dtoProperties = new StringBuilder();
+                var filterProperties = new StringBuilder();
 
-                StringBuilder ctorPropParam = new StringBuilder();
-                StringBuilder ctorPropParamAssign = new StringBuilder();
-                StringBuilder getListDtoSelect = new StringBuilder();
-                StringBuilder getListFilterCondition = new StringBuilder();
-                string multiTenant = "";
-                string getListOrderBy = "";
+                var ctorPropParam = new StringBuilder();
+                var ctorPropParamAssign = new StringBuilder();
+                var getListDtoSelect = new StringBuilder();
+                var getListFilterCondition = new StringBuilder();
+                var getListOrderBy = "";
 
-                if (_inputForm.IsMultiTenant)
-                {
-                    multiTenant = ", IMultiTenant";
-                    var propType = "Guid?";
-                    var propName = "TenantId";
-                    var propNameCamelCase = ToCamelCase(propName);
-                    properties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
-                    ctorPropParam.Append($", {propType} {propNameCamelCase}");
-                    ctorPropParamAssign.AppendLine($"        {propName} = {propNameCamelCase};");
-
-                    AddMultiTenantValidation(replacementsDictionary, itemTemplate);
-                }
-
+         
+                // Properties input format: propertyName:propertyType[:isRequired]
                 if (!string.IsNullOrWhiteSpace(_inputForm.Properties))
                 {
                     var propertiesData = _inputForm.Properties.Split(',');
                     foreach (var property in propertiesData)
                     {
                         var prop = property.Split(':');
-                        bool isRequired = false;
-                        if (prop.Length >= 2)
+                        var propName = prop[0];
+                        var propType = prop[1];
+                        var isRequired = prop.Length > 2 && prop[2].Equals("R", StringComparison.OrdinalIgnoreCase);
+
+                        var propNameCamelCase = ToCamelCase(propName);
+
+                        properties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
+                        if (isRequired)
                         {
-                            var propType = prop.LastOrDefault();
-                            var propName = prop.FirstOrDefault();
-                            if (prop.Length >= 3)
-                            {
-                                propName = prop[1];
-                                isRequired = (prop[2].ToLower() == "R".ToLower());
-                            }
-                            var propNameCamelCase = ToCamelCase(propName);
-
-                            properties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
-                            if (isRequired)
-                            {
-                                createupdateproperties.AppendLine($"   [Required]");
-                            }
-                            createupdateproperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
-                            dtoproperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
-
-                            ctorPropParam.Append($", {propType} {propNameCamelCase}");
-                            ctorPropParamAssign.AppendLine($"        {propName} = {propNameCamelCase};");
-
-                            if (string.IsNullOrWhiteSpace(getListOrderBy))
-                            {
-                                getListOrderBy = propName;
-                            }
-
-                            getListDtoSelect.AppendLine($"                                 {propName} = s.{propName},");
-
-                            if (propType == "string")
-                            {
-                                getListFilterCondition.AppendLine($"                               .WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.ToLower().Contains(filter.{propName}.ToLower()))");
-                            }
-                            else
-                            {
-                                getListFilterCondition.AppendLine($"                               .WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})");
-                                if (!propType.Contains("?"))
-                                {
-                                    propType += "?";
-                                }
-                            }
-                            filterproperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
+                            createUpdateProperties.AppendLine("   [Required]");
                         }
+                        createUpdateProperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
+                        dtoProperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
+
+                        ctorPropParam.Append($", {propType} {propNameCamelCase}");
+                        ctorPropParamAssign.AppendLine($"        {propName} = {propNameCamelCase};");
+
+                        if (string.IsNullOrWhiteSpace(getListOrderBy))
+                        {
+                            getListOrderBy = propName;
+                        }
+
+                        getListDtoSelect.AppendLine($"                                 {propName} = s.{propName},");
+
+                        if (propType == "string")
+                        {
+                            getListFilterCondition.AppendLine($"                               .WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.ToLower().Contains(filter.{propName}.ToLower()))");
+                        }
+                        else
+                        {
+                            getListFilterCondition.AppendLine($"                               .WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})");
+                            if (!propType.Contains("?"))
+                            {
+                                propType += "?";
+                            }
+                        }
+                        filterProperties.AppendLine($"    public {propType} {propName} {{ get; set; }}");
                     }
                 }
 
@@ -135,65 +126,26 @@ namespace AbpCrudTemplate
                 }
 
                 // Add custom parameters.
-                if (replacementsDictionary.ContainsKey("$entitycamelcase$"))
-                {
-                    replacementsDictionary["$entitycamelcase$"] = ToCamelCase(itemTemplate.SafeItemName);
-                }
-                if (replacementsDictionary.ContainsKey("$microservicename$"))
-                {
-                    replacementsDictionary["$microservicename$"] = itemTemplate.ServiceName;
-                }
-                if (replacementsDictionary.ContainsKey("$pluralentityname$"))
-                {
-                    replacementsDictionary["$pluralentityname$"] = _inputForm.PluralEntityName;
-                }
-                if (replacementsDictionary.ContainsKey("$properties$"))
-                {
-                    replacementsDictionary["$properties$"] = properties.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$createupdateproperties$"))
-                {
-                    replacementsDictionary["$createupdateproperties$"] = createupdateproperties.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$dtoproperties$"))
-                {
-                    replacementsDictionary["$dtoproperties$"] = dtoproperties.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$filterproperties$"))
-                {
-                    replacementsDictionary["$filterproperties$"] = filterproperties.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$ctorpropparam$"))
-                {
-                    replacementsDictionary["$ctorpropparam$"] = ctorPropParam.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$ctorpropparamassign$"))
-                {
-                    replacementsDictionary["$ctorpropparamassign$"] = ctorPropParamAssign.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$multitenant$"))
-                {
-                    replacementsDictionary["$multitenant$"] = multiTenant;
-                }
-
-                if (replacementsDictionary.ContainsKey("$getlistorderby$"))
-                {
-                    replacementsDictionary["$getlistorderby$"] = getListOrderBy;
-                }
-                if (replacementsDictionary.ContainsKey("$getlistdtoselect$"))
-                {
-                    replacementsDictionary["$getlistdtoselect$"] = getListDtoSelect.ToString();
-                }
-                if (replacementsDictionary.ContainsKey("$getlistfiltercondition$"))
-                {
-                    replacementsDictionary["$getlistfiltercondition$"] = getListFilterCondition.ToString();
-                }
-
-                //replacementsDictionary.Add("$entitycamelcase$", "");
+                replacementsDictionary["appname"] = itemTemplate.AppName;
+                replacementsDictionary["appnamecamelcase"] = itemTemplate.AppNameCamelCase;
+                replacementsDictionary["$entitycamelcase$"] = itemTemplate.EntityCamelCase;
+                replacementsDictionary["$pluralentityname$"] = _inputForm.PluralEntityName;
+                replacementsDictionary["pluralcamelcaseentityname"] = ToCamelCase(_inputForm.PluralEntityName);
+                replacementsDictionary["$properties$"] = properties.ToString();
+                replacementsDictionary["$createupdateproperties$"] = createUpdateProperties.ToString();
+                replacementsDictionary["$dtoproperties$"] = dtoProperties.ToString();
+                replacementsDictionary["$filterproperties$"] = filterProperties.ToString();
+                replacementsDictionary["$ctorpropparam$"] = ctorPropParam.ToString();
+                replacementsDictionary["$ctorpropparamassign$"] = ctorPropParamAssign.ToString();
+                replacementsDictionary["$getlistorderby$"] = getListOrderBy;
+                replacementsDictionary["$getlistdtoselect$"] = getListDtoSelect.ToString();
+                replacementsDictionary["$getlistfiltercondition$"] = getListFilterCondition.ToString();
 
                 UpdateDbContext(itemTemplate);
                 UpdateAutoMapperProfile(itemTemplate);
+                UpdatePermissions(itemTemplate, replacementsDictionary);
                 UpdatePermissionDefinition(itemTemplate);
+                UpdateLocalization(itemTemplate);
             }
             catch (Exception ex)
             {
@@ -201,14 +153,19 @@ namespace AbpCrudTemplate
             }
         }
 
+        public bool ShouldAddProjectItem(string filePath)
+        {
+            return _addProjectItem;
+        }
+
         private void UpdateDbContext(ItemTemplate itemTemplate)
         {
-            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetDbContextPath(itemTemplate.ServiceName);
+            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetDbContextPath(itemTemplate.AppName);
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
                 var positionText = "#region App Entities";
-                var newText = positionText + $"\r\npublic DbSet<{itemTemplate.SafeItemName}> {itemTemplate.SafeItemName}s {{ get; set;}} \r\n";
+                var newText = positionText + $"\r\npublic DbSet<{itemTemplate.SafeItemName}> {itemTemplate.PluralEntityName} {{ get; set;}} \r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
@@ -216,7 +173,7 @@ namespace AbpCrudTemplate
 
         private void UpdateAutoMapperProfile(ItemTemplate itemTemplate)
         {
-            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetAutoMapperProfilePath(itemTemplate.ServiceName);
+            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetAutoMapperProfilePath(itemTemplate.AppName);
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
@@ -229,95 +186,58 @@ namespace AbpCrudTemplate
             }
         }
 
-        private void UpdatePermissionDefinition(ItemTemplate itemTemplate)
+        private void UpdatePermissions(ItemTemplate itemTemplate, Dictionary<string, string> replacementsDictionary)
         {
-            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetAutoMapperProfilePath(itemTemplate.ServiceName);
+            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionPath(itemTemplate.AppName);
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
-                var positionText = "#endregion Desktop Permissions";
+                var positionText = "//public const string MyPermission1 = GroupName + \".MyPermission1\";";
                 var newText = positionText
-                    + $"\r\nCreateMap<CreateUpdate{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}>();\r\n"
-                    + $"\r\nCreateMap<{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}Dto>();\r\n";
+                    + $"\r\n\r\n    public static class {itemTemplate.PluralEntityName}\r\n"
+                    + "    {\r\n"
+                    + $"        public const string Default = GroupName + \".{itemTemplate.PluralEntityName}\";\r\n"
+                    + $"        public const string Create = Default + \".Create\";\r\n"
+                    + $"        public const string Edit = Default + \".Edit\";\r\n"
+                    + $"        public const string Delete = Default + \".Delete\";\r\n"
+                    + "    }\r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
         }
 
-        private void AddMultiTenantValidation(Dictionary<string, string> replacementsDictionary, ItemTemplate itemTemplate)
+        private void UpdatePermissionDefinition(ItemTemplate itemTemplate)
         {
-            #region Multi Tenant Authorization
-            StringBuilder multiTenantAuthorizationValidationStart = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationEnd = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationGet = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationGetList = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationCreate = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationUpdate = new StringBuilder();
-            StringBuilder multiTenantAuthorizationValidationDelete = new StringBuilder();
-            StringBuilder multitenantauthorizationimport = new StringBuilder();
-
-            multiTenantAuthorizationValidationStart.AppendLine("            if (CurrentTenant.Id == null)");
-            multiTenantAuthorizationValidationStart.AppendLine("            {");
-            multiTenantAuthorizationValidationStart.AppendLine("                var msg = $\"Unauthorized Access\";");
-            multiTenantAuthorizationValidationEnd.AppendLine("                throw new AbpAuthorizationException();");
-            multiTenantAuthorizationValidationEnd.AppendLine("            }");
-
-            multiTenantAuthorizationValidationGet.Append(multiTenantAuthorizationValidationStart);
-            multiTenantAuthorizationValidationGet.AppendLine($"                this._commonDependencies._logger.LogInformation($\"::{itemTemplate.SafeItemName}AppService:: - GetAsync - ::{{msg}}::\");");
-            multiTenantAuthorizationValidationGet.Append(multiTenantAuthorizationValidationEnd);
-
-            multiTenantAuthorizationValidationGetList.Append(multiTenantAuthorizationValidationStart);
-            multiTenantAuthorizationValidationGetList.AppendLine($"                this._commonDependencies._logger.LogInformation($\"::{itemTemplate.SafeItemName}AppService:: - GetListAsync - ::{{msg}}::\");");
-            multiTenantAuthorizationValidationGetList.Append(multiTenantAuthorizationValidationEnd);
-
-            multiTenantAuthorizationValidationCreate.Append(multiTenantAuthorizationValidationStart);
-            multiTenantAuthorizationValidationCreate.AppendLine($"                this._commonDependencies._logger.LogInformation($\"::{itemTemplate.SafeItemName}AppService:: - CreateAsync - ::{{msg}}::\");");
-            multiTenantAuthorizationValidationCreate.Append(multiTenantAuthorizationValidationEnd);
-
-            multiTenantAuthorizationValidationUpdate.Append(multiTenantAuthorizationValidationStart);
-            multiTenantAuthorizationValidationUpdate.AppendLine($"                this._commonDependencies._logger.LogInformation($\"::{itemTemplate.SafeItemName}AppService:: - UpdateAsync - ::{{msg}}::\");");
-            multiTenantAuthorizationValidationUpdate.Append(multiTenantAuthorizationValidationEnd);
-
-            multiTenantAuthorizationValidationDelete.Append(multiTenantAuthorizationValidationStart);
-            multiTenantAuthorizationValidationDelete.AppendLine($"                this._commonDependencies._logger.LogInformation($\"::{itemTemplate.SafeItemName}AppService:: - DeleteAsync - ::{{msg}}::\");");
-            multiTenantAuthorizationValidationDelete.Append(multiTenantAuthorizationValidationEnd);
-
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationvalidationget$"))
+            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionDefinitionPath(itemTemplate.AppName);
+            if (File.Exists(filePath))
             {
-                replacementsDictionary["$multitenantauthorizationvalidationget$"] = multiTenantAuthorizationValidationGet.ToString();
+                var fileText = File.ReadAllText(filePath);
+                var positionText = $"//myGroup.AddPermission({itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
+                var newText = positionText
+                      + $"\r\nvar {itemTemplate.EntityCamelCase}Permission = {itemTemplate.AppNameCamelCase}Group.AddPermission({itemTemplate.AppName}Permissions.{itemTemplate.PluralEntityName}.Default, L(\"Permission:{itemTemplate.PluralEntityName}\"));\r\n"
+                      + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Create, L(\"Permission:{itemTemplate.PluralEntityName}.Create\"));\r\n"
+                      + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Edit, L(\"Permission:{itemTemplate.PluralEntityName}.Edit\"));\r\n"
+                      + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Delete, L(\"Permission:{itemTemplate.PluralEntityName}.Delete\"));\r\n";
+                fileText = fileText.Replace(positionText, newText);
+                File.WriteAllText(filePath, fileText);
             }
-
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationvalidationgetlist$"))
-            {
-                replacementsDictionary["$multitenantauthorizationvalidationgetlist$"] = multiTenantAuthorizationValidationGetList.ToString();
-            }
-
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationvalidationcreate$"))
-            {
-                replacementsDictionary["$multitenantauthorizationvalidationcreate$"] = multiTenantAuthorizationValidationCreate.ToString();
-            }
-
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationvalidationupdate$"))
-            {
-                replacementsDictionary["$multitenantauthorizationvalidationupdate$"] = multiTenantAuthorizationValidationUpdate.ToString();
-            }
-
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationvalidationdelete$"))
-            {
-                replacementsDictionary["$multitenantauthorizationvalidationdelete$"] = multiTenantAuthorizationValidationDelete.ToString();
-            }
-
-            multitenantauthorizationimport.AppendLine($"using Volo.Abp.Authorization;");
-            if (replacementsDictionary.ContainsKey("$multitenantauthorizationimport$"))
-            {
-                replacementsDictionary["$multitenantauthorizationimport$"] = multitenantauthorizationimport.ToString();
-            }
-            #endregion
         }
 
-        public bool ShouldAddProjectItem(string filePath)
+        private void UpdateLocalization(ItemTemplate itemTemplate)
         {
-            return AddPItem;
+            var filePath = itemTemplate.SolutionDirectorySubPath + FilePath.GetLocalizationPath(itemTemplate.AppName);
+            if (File.Exists(filePath))
+            {
+                var fileText = File.ReadAllText(filePath);
+                var positionText = "\"Welcome\": \"Welcome\",";
+                var newText = positionText
+                    + $"\r\n    \"Permission:{itemTemplate.PluralEntityName}\": \"{itemTemplate.PluralEntityName}\",\r\n"
+                    + $"    \"Permission:{itemTemplate.PluralEntityName}.Create\": \"Create\",\r\n"
+                    + $"    \"Permission:{itemTemplate.PluralEntityName}.Edit\": \"Edit\",\r\n"
+                    + $"    \"Permission:{itemTemplate.PluralEntityName}.Delete\": \"Delete\"\r\n";
+                fileText = fileText.Replace(positionText, newText);
+                File.WriteAllText(filePath, fileText);
+            }
         }
 
         private string ToCamelCase(string name)

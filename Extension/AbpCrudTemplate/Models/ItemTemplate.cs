@@ -20,7 +20,10 @@ namespace AbpCrudTemplate.Models
             }
         }
         public string RootNamespace { get; set; }
+        public string AppName { get; set; }
+        public string AppNameCamelCase { get; set; }
         public string SafeItemName { get; set; }
-        public string ServiceName { get; set; }
+        public string EntityCamelCase { get; set; }
+        public string PluralEntityName { get; set; }
     }
 }
