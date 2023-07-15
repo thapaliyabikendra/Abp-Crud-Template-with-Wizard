@@ -16,11 +16,11 @@
     <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$AppService.cs" ReplaceParameters="true">ModelAppService.cs</ProjectItem>
     <ProjectItem SubType="" TargetFileName="PermissionAndAutoMapperProfile.cs" ReplaceParameters="true">PermissionAndAutoMapperProfile.cs</ProjectItem>
     <CustomParameters>
-      <CustomParameter Name="$appname$" Value="docYantra"/>
-      <CustomParameter Name="$appnamecamelcase$" Value="DocYantra"/>
-      <CustomParameter Name="$entitycamelcase$" Value="book"/>
-      <CustomParameter Name="$pluralentityname$" Value="Books"/>
-      <CustomParameter Name="$pluralcamelcaseentityname$" Value="books"/>
+      <CustomParameter Name="$appname$" Value=""/>
+      <CustomParameter Name="$appnamecamelcase$" Value=""/>
+      <CustomParameter Name="$entitycamelcase$" Value=""/>
+      <CustomParameter Name="$pluralentityname$" Value=""/>
+      <CustomParameter Name="$pluralcamelcaseentityname$" Value=""/>
       <CustomParameter Name="$properties$" Value=""/>
       <CustomParameter Name="$createupdateproperties$" Value=""/>
       <CustomParameter Name="$dtoproperties$" Value=""/>
@@ -32,4 +32,8 @@
       <CustomParameter Name="$getlistfiltercondition$" Value=""/>
     </CustomParameters>
   </TemplateContent>  
+    <WizardExtension>
+    <Assembly>AbpCrudTemplate, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=4acdac3ec01885cf</Assembly>
+    <FullClassName>AbpCrudTemplate.WizardImplementation</FullClassName>
+  </WizardExtension>
 </VSTemplate>

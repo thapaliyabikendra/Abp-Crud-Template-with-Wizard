@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TemplateWizard;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -47,7 +46,7 @@ namespace AbpCrudTemplate
                 var safeItemName = replacementsDictionary["$safeitemname$"];
                 if (string.IsNullOrWhiteSpace(_inputForm.PluralEntityName))
                 {
-                    _inputForm.PluralEntityName = safeItemName;
+                    _inputForm.PluralEntityName = $"{safeItemName}s";
                 }
 
                 var itemTemplate = new ItemTemplate
@@ -164,8 +163,15 @@ namespace AbpCrudTemplate
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
+
+                // Import namespace
+                var nameSpace = $"namespace {itemTemplate.RootNamespace}.EntityFrameworkCore;";
+                var importNamespace = $"using {itemTemplate.RootNamespace}.{itemTemplate.PluralEntityName};\n" + nameSpace;
+                fileText = fileText.Replace(nameSpace, importNamespace);
+
+                // Add dbset
                 var positionText = "#region App Entities";
-                var newText = positionText + $"\r\npublic DbSet<{itemTemplate.SafeItemName}> {itemTemplate.PluralEntityName} {{ get; set;}} \r\n";
+                var newText = positionText + $"\r\n\rpublic DbSet<{itemTemplate.SafeItemName}> {itemTemplate.PluralEntityName} {{ get; set;}} \r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
@@ -177,10 +183,16 @@ namespace AbpCrudTemplate
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
+
+                // Import namespace
+                var nameSpace = $"namespace {itemTemplate.RootNamespace};";
+                var importNamespace = $"using {itemTemplate.RootNamespace}.{itemTemplate.PluralEntityName};\n" + nameSpace;
+                fileText = fileText.Replace(nameSpace, importNamespace);
+
                 var positionText = "* into multiple profile classes for a better organization. */";
                 var newText = positionText
-                    + $"\r\nCreateMap<CreateUpdate{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}>();\r\n"
-                    + $"\r\nCreateMap<{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}Dto>();\r\n";
+                    + $"\r\n\r\rCreateMap<CreateUpdate{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}>();"
+                    + $"\r\n\r\rCreateMap<{itemTemplate.SafeItemName}Dto, {itemTemplate.SafeItemName}Dto>();\r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
@@ -214,10 +226,10 @@ namespace AbpCrudTemplate
                 var fileText = File.ReadAllText(filePath);
                 var positionText = $"//myGroup.AddPermission({itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
                 var newText = positionText
-                      + $"\r\nvar {itemTemplate.EntityCamelCase}Permission = {itemTemplate.AppNameCamelCase}Group.AddPermission({itemTemplate.AppName}Permissions.{itemTemplate.PluralEntityName}.Default, L(\"Permission:{itemTemplate.PluralEntityName}\"));\r\n"
+                      + $"\r\n\n\r\rvar {itemTemplate.EntityCamelCase}Permission = {itemTemplate.AppNameCamelCase}Group.AddPermission({itemTemplate.AppName}Permissions.{itemTemplate.PluralEntityName}.Default, L(\"Permission:{itemTemplate.PluralEntityName}\"));\r\n"
                       + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Create, L(\"Permission:{itemTemplate.PluralEntityName}.Create\"));\r\n"
                       + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Edit, L(\"Permission:{itemTemplate.PluralEntityName}.Edit\"));\r\n"
-                      + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Delete, L(\"Permission:{itemTemplate.PluralEntityName}.Delete\"));\r\n";
+                      + $"        {itemTemplate.EntityCamelCase}Permission.AddChild({itemTemplate.AppName}Permissions.{itemTemplate.SafeItemName}.Delete, L(\"Permission:{itemTemplate.PluralEntityName}.Delete\"));\r";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
@@ -234,7 +246,7 @@ namespace AbpCrudTemplate
                     + $"\r\n    \"Permission:{itemTemplate.PluralEntityName}\": \"{itemTemplate.PluralEntityName}\",\r\n"
                     + $"    \"Permission:{itemTemplate.PluralEntityName}.Create\": \"Create\",\r\n"
                     + $"    \"Permission:{itemTemplate.PluralEntityName}.Edit\": \"Edit\",\r\n"
-                    + $"    \"Permission:{itemTemplate.PluralEntityName}.Delete\": \"Delete\"\r\n";
+                    + $"    \"Permission:{itemTemplate.PluralEntityName}.Delete\": \"Delete,\"\r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }

@@ -1,3 +1,4 @@
+Permission
 public static class $pluralentityname$
 {
     public const string Default = GroupName + ".$pluralentityname$";
