@@ -1,0 +1,16 @@
+﻿<VSTemplateManifest Version="1.0" xmlns="http://schemas.microsoft.com/developer/vstemplatemanifest/2015">
+  <VSTemplateContainer TemplateType="Item">
+    <RelativePathOnDisk>Template</RelativePathOnDisk>
+    <TemplateFileName>ABPCrudTemplateWithWizard.vstemplate</TemplateFileName>
+    <VSTemplateHeader>
+      <TemplateData xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+        <DefaultName>Class</DefaultName>
+        <Name>Abp Crud Template with Wizard</Name>
+        <Description>&lt;Abp Crud Template with Wizard&gt;</Description>
+        <ProjectType>CSharp</ProjectType>
+        <SortOrder>7</SortOrder>
+        <Icon>__TemplateIcon.ico</Icon>
+      </TemplateData>
+    </VSTemplateHeader>
+  </VSTemplateContainer>
+</VSTemplateManifest>

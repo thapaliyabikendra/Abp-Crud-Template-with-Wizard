@@ -1,0 +1,35 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <DefaultName>Class</DefaultName>
+    <Name>Abp Crud Template with Wizard</Name>
+    <Description>&lt;Abp Crud Template with Wizard&gt;</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>7</SortOrder>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$.cs" ReplaceParameters="true">Model.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">CreateUpdateModelDto.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Dto.cs" ReplaceParameters="true">ModelDto.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Filter.cs" ReplaceParameters="true">ModelFilter.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\I$fileinputname$AppService.cs" ReplaceParameters="true">IModelAppService.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$AppService.cs" ReplaceParameters="true">ModelAppService.cs</ProjectItem>
+    <ProjectItem SubType="" TargetFileName="PermissionAndAutoMapperProfile.cs" ReplaceParameters="true">PermissionAndAutoMapperProfile.cs</ProjectItem>
+    <CustomParameters>
+      <CustomParameter Name="$appname$" Value="docYantra"/>
+      <CustomParameter Name="$appnamecamelcase$" Value="DocYantra"/>
+      <CustomParameter Name="$entitycamelcase$" Value="book"/>
+      <CustomParameter Name="$pluralentityname$" Value="Books"/>
+      <CustomParameter Name="$pluralcamelcaseentityname$" Value="books"/>
+      <CustomParameter Name="$properties$" Value=""/>
+      <CustomParameter Name="$createupdateproperties$" Value=""/>
+      <CustomParameter Name="$dtoproperties$" Value=""/>
+      <CustomParameter Name="$filterproperties$" Value=""/>
+      <CustomParameter Name="$ctorpropparam$" Value=""/>
+      <CustomParameter Name="$ctorpropparamassign$" Value=""/>
+      <CustomParameter Name="$getlistorderby$" Value="Name"/>
+      <CustomParameter Name="$getlistdtoselect$" Value=""/>
+      <CustomParameter Name="$getlistfiltercondition$" Value=""/>
+    </CustomParameters>
+  </TemplateContent>  
+</VSTemplate>
