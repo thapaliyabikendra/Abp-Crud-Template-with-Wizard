@@ -21,6 +21,7 @@ namespace AbpCrudTemplate
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
         {
+            // Move Model.Cs and
         }
 
         public void ProjectItemFinishedGenerating(ProjectItem projectItem)
