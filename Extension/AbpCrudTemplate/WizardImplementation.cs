@@ -35,10 +35,10 @@ namespace AbpCrudTemplate
             // Check Dir
 
             #region ModelAppService.cs
-            var applicationContractsPath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, Project.ApplicationContracts);
+            var applicationContractsPath = _itemTemplate.SolutionDirectorySubPath + Project.ApplicationContracts;
             var appServiceFileName = $"{_itemTemplate.SafeItemName}AppService.cs";
             var sourceAppServicePath = Path.Combine(applicationContractsPath, appServiceFileName);
-            var appServicePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, Project.Application, _itemTemplate.PluralEntityName);
+            var appServicePath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Application, _itemTemplate.PluralEntityName);
             var appServiceFilePath = Path.Combine(appServicePath, appServiceFileName);
             if (!Directory.Exists(appServicePath))
             {
@@ -53,7 +53,7 @@ namespace AbpCrudTemplate
             #region Model.cs
             var modelFileName = $"{_itemTemplate.SafeItemName}.cs";
             var sourceModelPath = Path.Combine(applicationContractsPath, modelFileName);
-            var modelPath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, Project.Domain, _itemTemplate.PluralEntityName);
+            var modelPath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Domain, _itemTemplate.PluralEntityName);
             var modelFilePath = Path.Combine(modelPath, modelFileName);
             if (!Directory.Exists(modelPath))
             {
