@@ -27,6 +27,5 @@ C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wi
 C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\ItemTemplates\Template\ModelAppService.cs
 C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\ItemTemplates\Template\ModelDto.cs
 C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\ItemTemplates\Template\ModelFilter.cs
-C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\ItemTemplates\Template\PermissionAndAutoMapperProfile.cs
 C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\ItemTemplates\Template\__TemplateIcon.ico
 C:\Users\bikithapaliya\Desktop\VisualStudioTemplates\Abp Crud AppService with Wizard\V2\Extension\AbpCrudTemplate\obj\Debug\templateFiles.json

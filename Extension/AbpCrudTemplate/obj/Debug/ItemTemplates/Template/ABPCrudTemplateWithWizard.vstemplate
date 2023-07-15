@@ -14,7 +14,6 @@
     <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Filter.cs" ReplaceParameters="true">ModelFilter.cs</ProjectItem>
     <ProjectItem SubType="" TargetFileName="\$pluralentityname$\I$fileinputname$AppService.cs" ReplaceParameters="true">IModelAppService.cs</ProjectItem>
     <ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$AppService.cs" ReplaceParameters="true">ModelAppService.cs</ProjectItem>
-    <ProjectItem SubType="" TargetFileName="PermissionAndAutoMapperProfile.cs" ReplaceParameters="true">PermissionAndAutoMapperProfile.cs</ProjectItem>
     <CustomParameters>
       <CustomParameter Name="$appname$" Value=""/>
       <CustomParameter Name="$appnamecamelcase$" Value=""/>
