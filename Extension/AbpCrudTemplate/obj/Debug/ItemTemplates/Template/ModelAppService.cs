@@ -4,13 +4,14 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Validation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
+using Volo.Abp.Domain.Repositories;
 using $rootnamespace$.Permissions;
 
 namespace $rootnamespace$.$pluralentityname$;

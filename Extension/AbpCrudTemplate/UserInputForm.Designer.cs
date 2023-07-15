@@ -70,14 +70,14 @@
             this.txtPluralEntityName.Location = new System.Drawing.Point(246, 116);
             this.txtPluralEntityName.Name = "txtPluralEntityName";
             this.txtPluralEntityName.Size = new System.Drawing.Size(366, 22);
-            this.txtPluralEntityName.TabIndex = 4;
+            this.txtPluralEntityName.TabIndex = 5;
             // 
             // txtAppName
             // 
             this.txtAppName.Location = new System.Drawing.Point(246, 56);
             this.txtAppName.Name = "txtAppName";
             this.txtAppName.Size = new System.Drawing.Size(366, 22);
-            this.txtAppName.TabIndex = 5;
+            this.txtAppName.TabIndex = 4;
             // 
             // txtProperties
             // 
