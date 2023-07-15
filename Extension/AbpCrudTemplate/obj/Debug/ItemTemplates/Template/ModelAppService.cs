@@ -11,7 +11,6 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Validation;
-using Volo.Abp.Domain.Repositories;
 using $rootnamespace$.Permissions;
 
 namespace $rootnamespace$.$pluralentityname$;

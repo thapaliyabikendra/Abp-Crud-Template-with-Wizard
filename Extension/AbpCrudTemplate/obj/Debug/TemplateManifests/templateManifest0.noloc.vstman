@@ -10,6 +10,7 @@
         <ProjectType>CSharp</ProjectType>
         <SortOrder>7</SortOrder>
         <Icon>__TemplateIcon.ico</Icon>
+        <Author>Bikendra Thapaliya</Author>
       </TemplateData>
     </VSTemplateHeader>
   </VSTemplateContainer>

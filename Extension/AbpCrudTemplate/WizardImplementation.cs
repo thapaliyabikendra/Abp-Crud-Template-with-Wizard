@@ -201,7 +201,7 @@ namespace AbpCrudTemplate
 
                 // Import namespace
                 var nameSpace = $"\nnamespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
-                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n" + nameSpace;
+                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r" + nameSpace;
                 fileText = fileText.Replace(nameSpace, importNamespace);
 
                 // Add dbset
@@ -241,7 +241,7 @@ namespace AbpCrudTemplate
                 var fileText = File.ReadAllText(filePath);
                 var positionText = "//public const string MyPermission1 = GroupName + \".MyPermission1\";";
                 var newText = positionText
-                    + $"\r\n\r\n    public static class {_itemTemplate.PluralEntityName}\r\n"
+                    + $"\r\n    public static class {_itemTemplate.PluralEntityName}\r\n"
                     + "    {\r\n"
                     + $"        public const string Default = GroupName + \".{_itemTemplate.PluralEntityName}\";\r\n"
                     + $"        public const string Create = Default + \".Create\";\r\n"
@@ -261,7 +261,7 @@ namespace AbpCrudTemplate
                 var fileText = File.ReadAllText(filePath);
                 var positionText = $"//myGroup.AddPermission({_itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
                 var newText = positionText
-                      + $"\r\n\n\t\tvar {_itemTemplate.EntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
+                      + $"\r\n\t\tvar {_itemTemplate.EntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
                       + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
                       + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
                       + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
