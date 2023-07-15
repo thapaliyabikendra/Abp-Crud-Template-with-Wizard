@@ -23,6 +23,14 @@ namespace AbpCrudTemplate
 
         public void ProjectFinishedGenerating(EnvDTE.Project project)
         {
+        }
+
+        public void ProjectItemFinishedGenerating(ProjectItem projectItem)
+        {
+        }
+
+        public void RunFinished()
+        {
             // Move Model.cs and ModelAppService.cs
             // Check Dir
 
@@ -58,14 +66,6 @@ namespace AbpCrudTemplate
             #endregion
         }
 
-        public void ProjectItemFinishedGenerating(ProjectItem projectItem)
-        {
-        }
-
-        public void RunFinished()
-        {
-        }
-        
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             try
@@ -201,7 +201,7 @@ namespace AbpCrudTemplate
 
                 // Import namespace
                 var nameSpace = $"\nnamespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
-                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n\n" + nameSpace;
+                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n" + nameSpace;
                 fileText = fileText.Replace(nameSpace, importNamespace);
 
                 // Add dbset
@@ -221,7 +221,7 @@ namespace AbpCrudTemplate
 
                 // Import namespace
                 var nameSpace = $"\nnamespace {_itemTemplate.RootNamespace};";
-                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n\n" + nameSpace;
+                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n" + nameSpace;
                 fileText = fileText.Replace(nameSpace, importNamespace);
 
                 var positionText = "* into multiple profile classes for a better organization. */";
@@ -262,9 +262,9 @@ namespace AbpCrudTemplate
                 var positionText = $"//myGroup.AddPermission({_itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
                 var newText = positionText
                       + $"\r\n\n\t\tvar {_itemTemplate.EntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.PluralEntityName}Permissions.{_itemTemplate.SafeItemName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.PluralEntityName}Permissions.{_itemTemplate.SafeItemName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.PluralEntityName}Permissions.{_itemTemplate.SafeItemName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
+                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
+                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
+                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
