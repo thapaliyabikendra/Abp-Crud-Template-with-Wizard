@@ -11588,11 +11588,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud AppService with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
+      "projectUniqueName": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud Template with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
       "projectName": "AbpCrudTemplate",
-      "projectPath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud AppService with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
+      "projectPath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud Template with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
       "packagesPath": "C:\\Users\\bikithapaliya\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud AppService with Wizard\\V2\\Extension\\AbpCrudTemplate\\obj\\",
+      "outputPath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud Template with Wizard\\V2\\Extension\\AbpCrudTemplate\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [

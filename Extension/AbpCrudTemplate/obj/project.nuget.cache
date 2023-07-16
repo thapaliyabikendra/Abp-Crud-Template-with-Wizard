@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "i55z12HZVTjlslNn42t+uNduJSHIdKP/+JTIUuXxXWUK3E0AzcOgnbnOpRT7V5mvLtubYFGZENREIqrqYG2iWg==",
+  "dgSpecHash": "tExA8cUCGjD7kNoKgy82Y0Oco18dcf3lZlLgGbtqnOV2HzKIFFEGgGPPVzkMCA9ha/m3cVjnIxi8QWTZHiGHdw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud AppService with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
+  "projectFilePath": "C:\\Users\\bikithapaliya\\Desktop\\VisualStudioTemplates\\Abp Crud Template with Wizard\\V2\\Extension\\AbpCrudTemplate\\AbpCrudTemplate.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\bikithapaliya\\.nuget\\packages\\envdte\\17.0.32112.339\\envdte.17.0.32112.339.nupkg.sha512",
     "C:\\Users\\bikithapaliya\\.nuget\\packages\\envdte100\\17.0.32112.339\\envdte100.17.0.32112.339.nupkg.sha512",

@@ -64,6 +64,33 @@ namespace AbpCrudTemplate
                 File.Move(sourceModelPath, modelFilePath);
             }
             #endregion
+
+            if (_inputForm.AddMigration)
+            {
+                string migrationCommand = $"dotnet ef migrations add 'added {_itemTemplate.SafeItemName}' --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator"; 
+                string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/S{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+
+                // Create the process for executing the commands
+                var process = new System.Diagnostics.Process();
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.RedirectStandardInput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+
+                // Execute the migration command
+                process.StandardInput.WriteLine(migrationCommand);
+                process.StandardInput.Flush();
+
+                if (_inputForm.UpdateDatabase)
+                {
+                    // Execute the update database command
+                    process.StandardInput.WriteLine(updateCommand);
+                    process.StandardInput.Flush();
+                }
+                process.StandardInput.Close();
+                process.WaitForExit();
+            }
         }
 
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
