@@ -67,6 +67,7 @@ namespace AbpCrudTemplate
                 }
                 #endregion
 
+                #region Migrations
                 if (_inputForm.AddMigration)
                 {
                     string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.PluralEntityName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
@@ -76,7 +77,7 @@ namespace AbpCrudTemplate
                     var process = new System.Diagnostics.Process();
                     process.StartInfo.FileName = "cmd.exe";
                     process.StartInfo.RedirectStandardInput = true;
-                    process.StartInfo.RedirectStandardOutput = true;
+                    //process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
                     process.Start();
@@ -92,8 +93,9 @@ namespace AbpCrudTemplate
                     }
                     process.StandardInput.Close();
                     process.WaitForExit();
-                    string output = process.StandardOutput.ReadToEnd();
+                    //string output = process.StandardOutput.ReadToEnd();
                 }
+                #endregion
             }
             catch (Exception ex)
             {
@@ -261,7 +263,7 @@ namespace AbpCrudTemplate
                 var positionText = "* into multiple profile classes for a better organization. */";
                 var newText = positionText
                     + $"\r\n\t\tCreateMap<CreateUpdate{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}>();"
-                    + $"\r\n\t\tCreateMap<{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}Dto>();\r\n";
+                    + $"\r\n\t\tCreateMap<{_itemTemplate.SafeItemName}, {_itemTemplate.SafeItemName}Dto>();\r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
