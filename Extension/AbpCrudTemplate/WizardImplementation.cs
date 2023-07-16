@@ -105,7 +105,6 @@ namespace AbpCrudTemplate
                 var getListDtoSelect = new StringBuilder();
                 var getListFilterCondition = new StringBuilder();
                 var getListOrderBy = "";
-
          
                 // Properties input format: propertyName:propertyType[:isRequired]
                 if (!string.IsNullOrWhiteSpace(_inputForm.Properties))
@@ -281,7 +280,7 @@ namespace AbpCrudTemplate
                     + $"\r\n    \"Permission:{_itemTemplate.PluralEntityName}\": \"{_itemTemplate.PluralEntityName}\",\r\n"
                     + $"    \"Permission:{_itemTemplate.PluralEntityName}.Create\": \"Create\",\r\n"
                     + $"    \"Permission:{_itemTemplate.PluralEntityName}.Edit\": \"Edit\",\r\n"
-                    + $"    \"Permission:{_itemTemplate.PluralEntityName}.Delete\": \"Delete,\"\r\n";
+                    + $"    \"Permission:{_itemTemplate.PluralEntityName}.Delete\": \"Delete\",\r\n";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }
