@@ -31,65 +31,73 @@ namespace AbpCrudTemplate
 
         public void RunFinished()
         {
-            // Move Model.cs and ModelAppService.cs
-            // Check Dir
-
-            #region ModelAppService.cs
-            var applicationContractsPath = _itemTemplate.SolutionDirectorySubPath + Project.ApplicationContracts;
-            var appServiceFileName = $"{_itemTemplate.SafeItemName}AppService.cs";
-            var sourceAppServicePath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, appServiceFileName);
-            var appServicePath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Application, _itemTemplate.PluralEntityName);
-            var appServiceFilePath = Path.Combine(appServicePath, appServiceFileName);
-            if (!Directory.Exists(appServicePath))
+            try
             {
-                Directory.CreateDirectory(appServicePath);
-            }
-            if (!File.Exists(appServiceFilePath))
-            {
-                File.Move(sourceAppServicePath, appServiceFilePath);
-            }
-            #endregion
+                // Move Model.cs and ModelAppService.cs
+                // Check Dir
 
-            #region Model.cs
-            var modelFileName = $"{_itemTemplate.SafeItemName}.cs";
-            var sourceModelPath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, modelFileName);
-            var modelPath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Domain, _itemTemplate.PluralEntityName);
-            var modelFilePath = Path.Combine(modelPath, modelFileName);
-            if (!Directory.Exists(modelPath))
-            {
-                Directory.CreateDirectory(modelPath);
-            }
-            if (!File.Exists(modelFilePath))
-            {
-                File.Move(sourceModelPath, modelFilePath);
-            }
-            #endregion
-
-            if (_inputForm.AddMigration)
-            {
-                string migrationCommand = $"dotnet ef migrations add 'added {_itemTemplate.SafeItemName}' --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator"; 
-                string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/S{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
-
-                // Create the process for executing the commands
-                var process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.RedirectStandardInput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-
-                // Execute the migration command
-                process.StandardInput.WriteLine(migrationCommand);
-                process.StandardInput.Flush();
-
-                if (_inputForm.UpdateDatabase)
+                #region ModelAppService.cs
+                var applicationContractsPath = _itemTemplate.SolutionDirectorySubPath + Project.ApplicationContracts;
+                var appServiceFileName = $"{_itemTemplate.SafeItemName}AppService.cs";
+                var sourceAppServicePath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, appServiceFileName);
+                var appServicePath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Application, _itemTemplate.PluralEntityName);
+                var appServiceFilePath = Path.Combine(appServicePath, appServiceFileName);
+                if (!Directory.Exists(appServicePath))
                 {
-                    // Execute the update database command
-                    process.StandardInput.WriteLine(updateCommand);
-                    process.StandardInput.Flush();
+                    Directory.CreateDirectory(appServicePath);
                 }
-                process.StandardInput.Close();
-                process.WaitForExit();
+                if (!File.Exists(appServiceFilePath))
+                {
+                    File.Move(sourceAppServicePath, appServiceFilePath);
+                }
+                #endregion
+
+                #region Model.cs
+                var modelFileName = $"{_itemTemplate.SafeItemName}.cs";
+                var sourceModelPath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, modelFileName);
+                var modelPath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Domain, _itemTemplate.PluralEntityName);
+                var modelFilePath = Path.Combine(modelPath, modelFileName);
+                if (!Directory.Exists(modelPath))
+                {
+                    Directory.CreateDirectory(modelPath);
+                }
+                if (!File.Exists(modelFilePath))
+                {
+                    File.Move(sourceModelPath, modelFilePath);
+                }
+                #endregion
+
+                if (_inputForm.AddMigration)
+                {
+                    string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.SafeItemName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+                    string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+
+                    // Create the process for executing the commands
+                    var process = new System.Diagnostics.Process();
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.Start();
+
+                    // Execute the migration command
+                    process.StandardInput.WriteLine(migrationCommand);
+                    process.StandardInput.Flush();
+                    if (_inputForm.UpdateDatabase)
+                    {
+                        // Execute the update database command
+                        process.StandardInput.WriteLine(updateCommand);
+                        process.StandardInput.Flush();
+                    }
+                    process.StandardInput.Close();
+                    process.WaitForExit();
+                    string output = process.StandardOutput.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -132,7 +140,7 @@ namespace AbpCrudTemplate
                 var getListDtoSelect = new StringBuilder();
                 var getListFilterCondition = new StringBuilder();
                 var getListOrderBy = "";
-         
+
                 // Properties input format: propertyName:propertyType[:isRequired]
                 if (!string.IsNullOrWhiteSpace(_inputForm.Properties))
                 {
