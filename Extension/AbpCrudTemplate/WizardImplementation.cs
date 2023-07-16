@@ -129,7 +129,8 @@ namespace AbpCrudTemplate
                     AppNameCamelCase = ToCamelCase(_inputForm.AppName),
                     SafeItemName = safeItemName,
                     PluralEntityName = _inputForm.PluralEntityName,
-                    EntityCamelCase = ToCamelCase(safeItemName)
+                    EntityCamelCase = ToCamelCase(safeItemName),
+                    PluralEntityCamelCase = ToCamelCase(_inputForm.PluralEntityName)
                 };
 
                 var properties = new StringBuilder();
@@ -297,10 +298,10 @@ namespace AbpCrudTemplate
                 var fileText = File.ReadAllText(filePath);
                 var positionText = $"//myGroup.AddPermission({_itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
                 var newText = positionText
-                      + $"\r\n\t\tvar {_itemTemplate.EntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
-                      + $"        {_itemTemplate.EntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
+                      + $"\r\n\t\tvar {_itemTemplate.PluralEntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
+                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
+                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
+                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
                 fileText = fileText.Replace(positionText, newText);
                 File.WriteAllText(filePath, fileText);
             }

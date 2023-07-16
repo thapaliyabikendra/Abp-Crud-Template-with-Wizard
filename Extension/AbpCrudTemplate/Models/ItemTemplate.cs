@@ -25,5 +25,6 @@ namespace AbpCrudTemplate.Models
         public string SafeItemName { get; set; }
         public string EntityCamelCase { get; set; }
         public string PluralEntityName { get; set; }
+        public string PluralEntityCamelCase { get; set; }
     }
 }
