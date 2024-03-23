@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TemplateWizard;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Project = AbpCrudTemplate.Constants.Project;
@@ -207,16 +208,21 @@ namespace AbpCrudTemplate
         private void InitializeItemTemplate(Dictionary<string, string> replacementsDictionary)
         {
             var safeItemName = replacementsDictionary["$safeitemname$"];
+            var appName = replacementsDictionary["$defaultnamespace$"]?.Split('.')?.LastOrDefault();
+            var pluralEntityName = string.IsNullOrWhiteSpace(_inputForm.PluralEntityName) ? $"{safeItemName}s" : _inputForm.PluralEntityName;
+
             _itemTemplate = new ItemTemplate
             {
-                SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
+                AppName = appName,
+                AppNameCamelCase = ToCamelCase(appName),
+
                 RootNamespace = replacementsDictionary["$rootnamespace$"],
-                AppName = _inputForm.AppName,
-                AppNameCamelCase = ToCamelCase(_inputForm.AppName),
+                SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
+
                 SafeItemName = safeItemName,
-                PluralEntityName = string.IsNullOrWhiteSpace(_inputForm.PluralEntityName) ? $"{safeItemName}s" : _inputForm.PluralEntityName,
                 EntityCamelCase = ToCamelCase(safeItemName),
-                PluralEntityCamelCase = ToCamelCase(_inputForm.PluralEntityName)
+                PluralEntityName = pluralEntityName,
+                PluralEntityCamelCase = ToCamelCase(pluralEntityName)
             };
         }
         private void UpdateDictionaries(Dictionary<string, string> replacementsDictionary)
@@ -225,7 +231,7 @@ namespace AbpCrudTemplate
             replacementsDictionary["$appnamecamelcase$"] = _itemTemplate.AppNameCamelCase;
             replacementsDictionary["$entitycamelcase$"] = _itemTemplate.EntityCamelCase;
             replacementsDictionary["$pluralentityname$"] = _itemTemplate.PluralEntityName;
-            replacementsDictionary["$pluralcamelcaseentityname$"] = ToCamelCase(_itemTemplate.PluralEntityName);
+            replacementsDictionary["$pluralcamelcaseentityname$"] = _itemTemplate.PluralEntityCamelCase;
         }
         private void UpdateDbContext()
         {
@@ -234,13 +240,13 @@ namespace AbpCrudTemplate
             {
                 var newText = new StringBuilder();
                 var importNamespace = new StringBuilder();
-                var nameSpace = @"namespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
-                var positionText = @"#region App Entities";
+                var nameSpace = $@"namespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
+                var positionText = $@"public {_itemTemplate.AppName}DbContext(";
 
-                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
-                               .Append(nameSpace);
-                newText.AppendLine(positionText)
-                       .Append("\t\t").AppendLine($"public DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}}");
+                importNamespace.Append($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .AppendLine(nameSpace);
+                newText.AppendLine($"public DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}}")
+                       .Append("\t").Append(positionText);
 
                 return fileText.Replace(nameSpace, importNamespace.ToString()).Replace(positionText, newText.ToString());
             });
@@ -248,7 +254,7 @@ namespace AbpCrudTemplate
         }
         private void UpdateAutoMapperProfile()
         {
-            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetAutoMapperProfilePath(_itemTemplate.AppName));
+            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetAutoMapperProfilePath(_itemTemplate.AppName);
             UpdateFile(filePath, fileText =>
             {
                 var newText = new StringBuilder();
@@ -256,8 +262,8 @@ namespace AbpCrudTemplate
                 var nameSpace = $@"namespace {_itemTemplate.RootNamespace};";
                 var positionText = @"* into multiple profile classes for a better organization. */";
 
-                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
-                               .Append(nameSpace);
+                importNamespace.Append($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .AppendLine(nameSpace);
                 newText.AppendLine(positionText)
                        .Append("\t\t").AppendLine($"CreateMap<CreateUpdate{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}>();")
                        .Append("\t\t").Append($"CreateMap<{_itemTemplate.SafeItemName}, {_itemTemplate.SafeItemName}Dto>();");
@@ -267,7 +273,7 @@ namespace AbpCrudTemplate
         }
         private void UpdatePermissions()
         {
-            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionPath(_itemTemplate.AppName));
+            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionPath(_itemTemplate.AppName);
             UpdateFile(filePath, fileText =>
             {
                 var updatedText = new StringBuilder();
@@ -286,7 +292,7 @@ namespace AbpCrudTemplate
         }
         private void UpdatePermissionDefinition()
         {
-            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionDefinitionPath(_itemTemplate.AppName));
+            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionDefinitionPath(_itemTemplate.AppName);
 
             UpdateFile(filePath, fileText =>
             {
@@ -304,7 +310,7 @@ namespace AbpCrudTemplate
         }
         private void UpdateLocalization()
         {
-            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetLocalizationPath(_itemTemplate.AppName));
+            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetLocalizationPath(_itemTemplate.AppName);
 
             UpdateFile(filePath, fileText =>
             {
