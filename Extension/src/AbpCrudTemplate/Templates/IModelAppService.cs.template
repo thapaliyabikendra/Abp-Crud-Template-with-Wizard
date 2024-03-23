@@ -4,13 +4,11 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
 namespace $rootnamespace$.$pluralentityname$;
-public interface $safeitemname$:
-    ICrudAppService<
-            $fileinputname$Dto,
-            Guid,
-            PagedAndSortedResultRequestDto,
-            CreateUpdate$fileinputname$Dto
-        >
+public interface $safeitemname$: IApplicationService
 {
+    public Task<$fileinputname$Dto> GetAsync(Guid id);
     public Task<PagedResultDto<$fileinputname$Dto>> GetListByFilterAsync(PagedAndSortedResultRequestDto input, $fileinputname$Filter filter);
+    public Task<bool> CreateAsync(CreateUpdate$fileinputname$Dto input);
+    public Task<bool> UpdateAsync(Guid id, CreateUpdate$fileinputname$Dto input);
+    public Task<bool> DeleteAsync(Guid id);
 }

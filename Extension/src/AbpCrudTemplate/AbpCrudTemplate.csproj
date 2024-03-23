@@ -55,12 +55,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Templates\CreateUpdateModelDto.cs" />
-    <Compile Include="Templates\IModelAppService.cs" />
-    <Compile Include="Templates\Model.cs" />
-    <Compile Include="Templates\ModelAppService.cs" />
-    <Compile Include="Templates\ModelDto.cs" />
-    <Compile Include="Templates\ModelFilter.cs" />
+    <None Include="Templates\CreateUpdateModelDto.cs.template" />
+    <None Include="Templates\IModelAppService.cs.template" />
+    <None Include="Templates\Model.cs.template" />
+    <None Include="Templates\ModelAppService.cs.template" />
+    <None Include="Templates\ModelDto.cs.template" />
+    <None Include="Templates\ModelFilter.cs.template" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AbpCrudTemplate.ico" />

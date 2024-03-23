@@ -1,0 +1,199 @@
+﻿using System;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using Volo.Abp;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Validation;
+using $rootnamespace$.Permissions;
+
+namespace $rootnamespace$.$pluralentityname$;
+[Authorize($appname$Permissions.$pluralentityname$.Default)]
+public class $safeitemname$: ApplicationService, I$fileinputname$AppService
+{
+    #region Properties
+    private readonly IRepository<$fileinputname$, Guid> _$entitycamelcase$Repository;
+    private readonly ILogger<$fileinputname$AppService> _logger;
+    #endregion
+
+    #region Constructor
+    public $fileinputname$AppService(
+        IRepository<$fileinputname$, Guid> $entitycamelcase$Repository,
+        ILogger<$fileinputname$AppService> logger
+    )
+    {
+        _$entitycamelcase$Repository = $entitycamelcase$Repository;
+        _logger = logger;
+    }
+    #endregion
+
+    #region Public Methods
+    [Authorize($appname$Permissions.$pluralentityname$.Default)]
+    public async Task<$fileinputname$Dto> GetAsync(Guid id)
+    {
+        try
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Started::");
+
+            var $entitycamelcase$ = await _$entitycamelcase$Repository.FindAsync(s => s.Id == id);
+            var response = ObjectMapper.Map <$fileinputname$, $fileinputname$Dto > ($entitycamelcase$);
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Exception:: - {ex.Message}");
+            throw new UserFriendlyException(ex.Message);
+        }
+        finally
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Ended::");
+        }
+    }
+
+    [Authorize($appname$Permissions.$pluralentityname$.Default)]
+    public async Task<PagedResultDto<$fileinputname$Dto>> GetListByFilterAsync(PagedAndSortedResultRequestDto input, $fileinputname$Filter filter)
+    {
+        try
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetListByFilterAsync - ::Started::");
+
+            if (input.Sorting.IsNullOrWhiteSpace())
+            {
+                input.Sorting = $"$getlistorderby$";
+            }
+
+            var $pluralcamelcaseentityname$ = await _$entitycamelcase$Repository.GetQueryableAsync();
+
+            var query = (from s in $pluralcamelcaseentityname$
+                        select new $fileinputname$Dto()
+                        {
+                        Id = s.Id,$getlistdtoselect$
+                        CreationTime = s.CreationTime
+                        })$getlistfiltercondition$;
+
+            var dtos = await AsyncExecuter.ToListAsync(
+                 query
+                 .OrderBy(input.Sorting)
+                 .Skip(input.SkipCount)
+                 .Take(input.MaxResultCount)
+             );
+            var totalCount = query.Count();
+
+            return new PagedResultDto<$fileinputname$Dto>(
+                totalCount,
+                dtos
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetListByFilterAsync - ::Exception:: - {ex.Message}");
+            throw new UserFriendlyException(ex.Message);
+        }
+        finally
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetListByFilterAsync - ::Ended::");
+        }
+    }
+
+    [Authorize($appname$Permissions.$pluralentityname$.Create)]
+    public async Task<bool> CreateAsync(CreateUpdate$fileinputname$Dto input)
+    {
+        try
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Started::");
+
+            var $entitycamelcase$ = ObjectMapper.Map < CreateUpdate$fileinputname$Dto, $fileinputname$> ($entitycamelcase$);
+            await _$entitycamelcase$Repository.InsertAsync($entitycamelcase$ );
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Exception:: - {ex.Message}");
+            throw new UserFriendlyException(ex.Message);
+        }
+        finally
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Ended::");
+        }
+    }
+
+    [Authorize($appname$Permissions.$pluralentityname$.Edit)]
+    public async Task<bool> UpdateAsync(Guid id, CreateUpdate$fileinputname$Dto input)
+    {
+        try
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - UpdateAsync - ::Started::");
+
+            var $entitycamelcase$ = await _$entitycamelcase$Repository.FindAsync(x => x.Id == id);
+            if ($entitycamelcase$ == null)
+                        {
+                var msg = "$fileinputname$ Not Found.";
+                _logger.LogInformation($"::$fileinputname$AppService:: - UpdateAsync - ::{msg}::");
+                throw new AbpValidationException(msg,
+                    new List<ValidationResult>
+                    {
+                                    new ValidationResult(msg, new []{ "id" })
+                    }
+                );
+            }
+
+            ObjectMapper.Map(input, $entitycamelcase$);
+            await _$entitycamelcase$Repository.UpdateAsync($entitycamelcase$);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - UpdateAsync - ::Exception:: - {ex.Message}");
+            throw new UserFriendlyException(ex.Message);
+        }
+        finally
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - UpdateAsync - ::Ended::");
+        }
+    }
+
+    [Authorize($appname$Permissions.$pluralentityname$.Delete)]
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        try
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - DeleteAsync - ::Started::");
+
+            var $entitycamelcase$ = await _$entitycamelcase$Repository.FirstOrDefaultAsync(s => s.Id == id);
+            if ($entitycamelcase$ == null)
+                        {
+                var msg = "$fileinputname$ Not Found.";
+                _logger.LogInformation($"::$fileinputname$AppService:: - DeleteAsync - ::{msg}::");
+                throw new AbpValidationException(msg,
+                    new List<ValidationResult>
+                    {
+                                    new ValidationResult(msg, new []{ "id" })
+                    }
+                );
+            }
+
+            await _$entitycamelcase$Repository.UpdateAsync($entitycamelcase$);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - DeleteAsync - ::Exception:: - {ex.Message}");
+            throw new UserFriendlyException(ex.Message);
+        }
+        finally
+        {
+            _logger.LogInformation($"::$fileinputname$AppService:: - DeleteAsync - ::Ended::");
+        }
+    }
+    #endregion
+}

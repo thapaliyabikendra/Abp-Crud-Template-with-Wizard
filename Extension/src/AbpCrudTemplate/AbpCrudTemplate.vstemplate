@@ -18,25 +18,24 @@
 				<Assembly>System</Assembly>
 			</Reference>
 		</References>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$.cs" ReplaceParameters="true">Templates\Model.cs</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">Templates\CreateUpdateModelDto.cs</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Dto.cs" ReplaceParameters="true">Templates\ModelDto.cs</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Filter.cs" ReplaceParameters="true">Templates\ModelFilter.cs</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\I$fileinputname$AppService.cs" ReplaceParameters="true">Templates\IModelAppService.cs</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$AppService.cs" ReplaceParameters="true">Templates\ModelAppService.cs</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$.cs" ReplaceParameters="true">Templates\Model.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">Templates\CreateUpdateModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Dto.cs" ReplaceParameters="true">Templates\ModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$Filter.cs" ReplaceParameters="true">Templates\ModelFilter.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\I$fileinputname$AppService.cs" ReplaceParameters="true">Templates\IModelAppService.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$pluralentityname$\$fileinputname$AppService.cs" ReplaceParameters="true">Templates\ModelAppService.cs.template</ProjectItem>
 		<CustomParameters>
 			<CustomParameter Name="$appname$" Value=""/>
-			<CustomParameter Name="$appnamecamelcase$" Value=""/>
 			<CustomParameter Name="$entitycamelcase$" Value=""/>
 			<CustomParameter Name="$pluralentityname$" Value=""/>
 			<CustomParameter Name="$pluralcamelcaseentityname$" Value=""/>
+			
 			<CustomParameter Name="$properties$" Value=""/>
 			<CustomParameter Name="$createupdateproperties$" Value=""/>
 			<CustomParameter Name="$dtoproperties$" Value=""/>
 			<CustomParameter Name="$filterproperties$" Value=""/>
-			<CustomParameter Name="$ctorpropparam$" Value=""/>
-			<CustomParameter Name="$ctorpropparamassign$" Value=""/>
-			<CustomParameter Name="$getlistorderby$" Value="Name"/>
+			
+			<CustomParameter Name="$getlistorderby$" Value=""/>
 			<CustomParameter Name="$getlistdtoselect$" Value=""/>
 			<CustomParameter Name="$getlistfiltercondition$" Value=""/>
 		</CustomParameters>

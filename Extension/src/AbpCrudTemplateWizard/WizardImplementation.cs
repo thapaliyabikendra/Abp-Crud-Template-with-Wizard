@@ -70,62 +70,60 @@ namespace AbpCrudTemplate
                 var dtoProperties = new StringBuilder();
                 var filterProperties = new StringBuilder();
 
-                var ctorPropParam = new StringBuilder();
-                var ctorPropParamAssign = new StringBuilder();
                 var getListDtoSelect = new StringBuilder();
                 var getListFilterCondition = new StringBuilder();
                 var getListOrderBy = "";
 
-                // Properties input format: propertyName:propertyType[:isRequired]
-                if (!string.IsNullOrWhiteSpace(_inputForm.Properties))
+                if (string.IsNullOrWhiteSpace(_inputForm.Properties))
                 {
-                    var propertiesData = _inputForm.Properties.Split(',');
-                    foreach (var property in propertiesData)
-                    {
-                        var prop = property.Split(':');
-                        var propName = prop[0].Trim();
-                        var propType = prop[1].Trim();
-                        var isRequired = prop.Length > 2 && prop[2].Equals("R", StringComparison.OrdinalIgnoreCase);
-
-                        var propNameCamelCase = ToCamelCase(propName);
-
-                        properties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
-                        if (isRequired)
-                        {
-                            createUpdateProperties.AppendLine("\t[Required]");
-                        }
-                        createUpdateProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
-                        dtoProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
-
-                        ctorPropParam.Append($", {propType} {propNameCamelCase}");
-                        ctorPropParamAssign.AppendLine($"\t\t{propName} = {propNameCamelCase};");
-
-                        if (string.IsNullOrWhiteSpace(getListOrderBy))
-                        {
-                            getListOrderBy = propName;
-                        }
-
-                        getListDtoSelect.AppendLine($"\t\t\t\t\t\t\t\t{propName} = s.{propName},");
-
-                        if (propType == "string")
-                        {
-                            getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.Contains(filter.{propName}, StringComparison.OrdinalIgnoreCase))");
-                        }
-                        else
-                        {
-                            getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})");
-                            if (!propType.Contains("?"))
-                            {
-                                propType += "?";
-                            }
-                        }
-                        filterProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
-                    }
+                    MessageBox.Show("Enter Properties");
+                    return;
                 }
 
+                // Properties input format: PropertyName:PropertyType[:IsRequired]
+                // ex. DisplayName:string:R
+                var propertiesData = _inputForm.Properties.Split(',');
+                foreach (var property in propertiesData)
+                {
+                    var prop = property.Split(':');
+                    var propName = prop[0].Trim();
+                    var propType = prop[1].Trim();
+                    var isRequired = prop.Length > 2 && prop[2].Equals("R", StringComparison.OrdinalIgnoreCase);
+
+                    properties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                    if (isRequired)
+                    {
+                        createUpdateProperties.AppendLine("\t[Required]");
+                    }
+                    createUpdateProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                    dtoProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+
+                    if (string.IsNullOrWhiteSpace(getListOrderBy))
+                    {
+                        getListOrderBy = propName;
+                    }
+
+                    getListDtoSelect.AppendLine($"\t\t\t\t\t\t\t\t{propName} = s.{propName},");
+
+                    if (propType == "string")
+                    {
+                        getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.Contains(filter.{propName}, StringComparison.OrdinalIgnoreCase))");
+                    }
+                    else
+                    {
+                        getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})");
+                        if (!propType.Contains("?"))
+                        {
+                            propType += "?";
+                        }
+                    }
+                    filterProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                }
+
+                // set order by to  CreationTime desc if prop not found
                 if (string.IsNullOrWhiteSpace(getListOrderBy))
                 {
-                    getListOrderBy = "Name";
+                    getListOrderBy = "CreationTime desc";
                 }
 
                 // Add custom parameters.
@@ -133,8 +131,7 @@ namespace AbpCrudTemplate
                 replacementsDictionary["$createupdateproperties$"] = createUpdateProperties.ToString();
                 replacementsDictionary["$dtoproperties$"] = dtoProperties.ToString();
                 replacementsDictionary["$filterproperties$"] = filterProperties.ToString();
-                replacementsDictionary["$ctorpropparam$"] = ctorPropParam.ToString();
-                replacementsDictionary["$ctorpropparamassign$"] = ctorPropParamAssign.ToString();
+
                 replacementsDictionary["$getlistorderby$"] = getListOrderBy;
                 replacementsDictionary["$getlistdtoselect$"] = getListDtoSelect.ToString();
                 replacementsDictionary["$getlistfiltercondition$"] = getListFilterCondition.ToString();
@@ -217,11 +214,8 @@ namespace AbpCrudTemplate
             _itemTemplate = new ItemTemplate
             {
                 AppName = appName,
-                AppNameCamelCase = ToCamelCase(appName),
-
                 RootNamespace = replacementsDictionary["$rootnamespace$"],
                 SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
-
                 SafeItemName = safeItemName,
                 EntityCamelCase = ToCamelCase(safeItemName),
                 PluralEntityName = pluralEntityName,
