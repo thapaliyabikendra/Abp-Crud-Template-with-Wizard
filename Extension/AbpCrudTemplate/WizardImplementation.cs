@@ -33,13 +33,16 @@ namespace AbpCrudTemplate
         {
             try
             {
-                // Move Model.cs and ModelAppService.cs files
-                MoveFiles();
-
-                // Migrations (Add migrations and Update database)
-                if (_inputForm.AddMigration)
+                if (_addProjectItem)
                 {
-                    ExecuteMigrationCommands();
+                    // Move Model.cs and ModelAppService.cs files
+                    MoveFiles();
+
+                    // Migrations (Add migrations and Update database)
+                    if (_inputForm.AddMigration)
+                    {
+                        ExecuteMigrationCommands();
+                    }
                 }
             }
             catch (Exception ex)
@@ -243,8 +246,8 @@ namespace AbpCrudTemplate
                 var nameSpace = $@"namespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
                 var positionText = $@"public {_itemTemplate.AppName}DbContext(";
 
-                importNamespace.Append($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
-                               .AppendLine(nameSpace);
+                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .Append(nameSpace);
                 newText.AppendLine($"public DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}}")
                        .Append("\t").Append(positionText);
 
@@ -262,8 +265,8 @@ namespace AbpCrudTemplate
                 var nameSpace = $@"namespace {_itemTemplate.RootNamespace};";
                 var positionText = @"* into multiple profile classes for a better organization. */";
 
-                importNamespace.Append($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
-                               .AppendLine(nameSpace);
+                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .Append(nameSpace);
                 newText.AppendLine(positionText)
                        .Append("\t\t").AppendLine($"CreateMap<CreateUpdate{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}>();")
                        .Append("\t\t").Append($"CreateMap<{_itemTemplate.SafeItemName}, {_itemTemplate.SafeItemName}Dto>();");
@@ -279,7 +282,7 @@ namespace AbpCrudTemplate
                 var updatedText = new StringBuilder();
                 var positionText = @"//public const string MyPermission1 = GroupName + "".MyPermission1"";";
 
-                updatedText.Append("\t").AppendLine($@"	public static class {_itemTemplate.PluralEntityName}")
+                updatedText.AppendLine($@"public static class {_itemTemplate.PluralEntityName}")
                            .Append("\t").AppendLine("{")
                            .Append("\t\t").AppendLine($@"public const string Default = GroupName + "".{_itemTemplate.PluralEntityName}"";")
                            .Append("\t\t").AppendLine($@"public const string Create = Default + "".Create"";")
