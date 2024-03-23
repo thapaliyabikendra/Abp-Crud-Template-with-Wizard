@@ -17,18 +17,17 @@ namespace AbpCrudTemplate
         private bool _addProjectItem = true;
         private ItemTemplate _itemTemplate;
 
+        #region Public Methods
+
         public void BeforeOpeningFile(ProjectItem projectItem)
         {
         }
-
         public void ProjectFinishedGenerating(EnvDTE.Project project)
         {
         }
-
         public void ProjectItemFinishedGenerating(ProjectItem projectItem)
         {
         }
-
         public void RunFinished()
         {
             try
@@ -47,61 +46,6 @@ namespace AbpCrudTemplate
                 MessageBox.Show(ex.ToString());
             }
         }
-
-        private void MoveFiles()
-        {
-            // Move AppService from ApplicationContracts to Application
-            MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Project.ApplicationContracts, Project.Application);
-
-            // Move Model from ApplicationContracts to Domain
-            MoveFile($"{_itemTemplate.SafeItemName}.cs", Project.ApplicationContracts, Project.Domain);
-        }
-
-        private void MoveFile(string fileName, string sourceDirectory, string destinationDirectory)
-        {
-            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, sourceDirectory, _itemTemplate.PluralEntityName, fileName);
-            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, destinationDirectory, _itemTemplate.PluralEntityName, fileName);
-
-            if (File.Exists(sourceFilePath))
-            {
-                string directoryPath = Path.GetDirectoryName(destinationFilePath);
-                if (!Directory.Exists(directoryPath))
-                    Directory.CreateDirectory(directoryPath);
-
-                if (!File.Exists(destinationFilePath))
-                    File.Move(sourceFilePath, destinationFilePath);
-            }
-        }
-
-        private void ExecuteMigrationCommands()
-        {
-            string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.PluralEntityName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
-            string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
-
-            using (var process = new System.Diagnostics.Process())
-            {
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.RedirectStandardInput = true;
-                //process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.Start();
-
-                process.StandardInput.WriteLine(migrationCommand);
-                process.StandardInput.Flush();
-
-                if (_inputForm.UpdateDatabase)
-                {
-                    process.StandardInput.WriteLine(updateCommand);
-                    process.StandardInput.Flush();
-                }
-
-                process.StandardInput.Close();
-                process.WaitForExit();
-                //string output = process.StandardOutput.ReadToEnd();
-            }
-        }
-
         public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
             try
@@ -202,7 +146,64 @@ namespace AbpCrudTemplate
                 MessageBox.Show(ex.ToString());
             }
         }
+        public bool ShouldAddProjectItem(string filePath)
+        {
+            return _addProjectItem;
+        }
+        #endregion
 
+        #region Private Methods
+        private void MoveFiles()
+        {
+            // Move AppService from ApplicationContracts to Application
+            MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Project.ApplicationContracts, Project.Application);
+
+            // Move Model from ApplicationContracts to Domain
+            MoveFile($"{_itemTemplate.SafeItemName}.cs", Project.ApplicationContracts, Project.Domain);
+        }
+        private void MoveFile(string fileName, string sourceDirectory, string destinationDirectory)
+        {
+            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, sourceDirectory, _itemTemplate.PluralEntityName, fileName);
+            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, destinationDirectory, _itemTemplate.PluralEntityName, fileName);
+
+            if (File.Exists(sourceFilePath))
+            {
+                string directoryPath = Path.GetDirectoryName(destinationFilePath);
+                if (!Directory.Exists(directoryPath))
+                    Directory.CreateDirectory(directoryPath);
+
+                if (!File.Exists(destinationFilePath))
+                    File.Move(sourceFilePath, destinationFilePath);
+            }
+        }
+        private void ExecuteMigrationCommands()
+        {
+            string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.PluralEntityName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+            string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+
+            using (var process = new System.Diagnostics.Process())
+            {
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.RedirectStandardInput = true;
+                //process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+
+                process.StandardInput.WriteLine(migrationCommand);
+                process.StandardInput.Flush();
+
+                if (_inputForm.UpdateDatabase)
+                {
+                    process.StandardInput.WriteLine(updateCommand);
+                    process.StandardInput.Flush();
+                }
+
+                process.StandardInput.Close();
+                process.WaitForExit();
+                //string output = process.StandardOutput.ReadToEnd();
+            }
+        }
         private void InitializeItemTemplate(Dictionary<string, string> replacementsDictionary)
         {
             var safeItemName = replacementsDictionary["$safeitemname$"];
@@ -218,7 +219,6 @@ namespace AbpCrudTemplate
                 PluralEntityCamelCase = ToCamelCase(_inputForm.PluralEntityName)
             };
         }
-
         private void UpdateDictionaries(Dictionary<string, string> replacementsDictionary)
         {
             replacementsDictionary["$appname$"] = _itemTemplate.AppName;
@@ -227,12 +227,6 @@ namespace AbpCrudTemplate
             replacementsDictionary["$pluralentityname$"] = _itemTemplate.PluralEntityName;
             replacementsDictionary["$pluralcamelcaseentityname$"] = ToCamelCase(_itemTemplate.PluralEntityName);
         }
-
-        public bool ShouldAddProjectItem(string filePath)
-        {
-            return _addProjectItem;
-        }
-
         private void UpdateDbContext()
         {
             var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetDbContextPath(_itemTemplate.AppName);
@@ -252,7 +246,6 @@ namespace AbpCrudTemplate
             });
 
         }
-
         private void UpdateAutoMapperProfile()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetAutoMapperProfilePath(_itemTemplate.AppName));
@@ -272,7 +265,6 @@ namespace AbpCrudTemplate
                 return fileText.Replace(nameSpace, importNamespace.ToString()).Replace(positionText, newText.ToString());
             });
         }
-
         private void UpdatePermissions()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionPath(_itemTemplate.AppName));
@@ -292,7 +284,6 @@ namespace AbpCrudTemplate
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
-
         private void UpdatePermissionDefinition()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionDefinitionPath(_itemTemplate.AppName));
@@ -307,11 +298,10 @@ namespace AbpCrudTemplate
                            .Append("\t\t").AppendLine($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(""Permission:{_itemTemplate.PluralEntityName}.Create""));")
                            .Append("\t\t").AppendLine($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(""Permission:{_itemTemplate.PluralEntityName}.Edit""));")
                            .Append("\t\t").Append($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(""Permission:{_itemTemplate.PluralEntityName}.Delete""));");
-               
+
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
-
         private void UpdateLocalization()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetLocalizationPath(_itemTemplate.AppName));
@@ -330,7 +320,6 @@ namespace AbpCrudTemplate
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
-
         private void UpdateFile(string filePath, Func<string, string> updateAction)
         {
             if (File.Exists(filePath))
@@ -340,10 +329,10 @@ namespace AbpCrudTemplate
                 File.WriteAllText(filePath, fileText);
             }
         }
-
         private string ToCamelCase(string name)
         {
-            return (name.Length < 1) ? "" :Char.ToLowerInvariant(name[0]) + name.Substring(1);
+            return (name.Length < 1) ? "" : Char.ToLowerInvariant(name[0]) + name.Substring(1);
         }
+        #endregion
     }
 }
