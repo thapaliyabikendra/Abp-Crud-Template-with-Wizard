@@ -313,17 +313,27 @@ namespace AbpCrudTemplate
 
         private void UpdateLocalization(ItemTemplate _itemTemplate)
         {
-            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetLocalizationPath(_itemTemplate.AppName);
+            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetLocalizationPath(_itemTemplate.AppName));
+
+            UpdateFile(filePath, fileText =>
+            {
+                var positionText = "\"Welcome\": \"Welcome\",";
+                var updatedText = new StringBuilder();
+                updatedText.AppendLine(positionText);
+                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}\": \"{_itemTemplate.PluralEntityName}\",");
+                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Create\": \"Create\",");
+                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Edit\": \"Edit\",");
+                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Delete\": \"Delete\",");
+                return fileText.ToString().Replace(positionText, updatedText.ToString());
+            });
+        }
+
+        private void UpdateFile(string filePath, Func<string, string> updateAction)
+        {
             if (File.Exists(filePath))
             {
                 var fileText = File.ReadAllText(filePath);
-                var positionText = "\"Welcome\": \"Welcome\",";
-                var newText = positionText
-                    + $"\r\n    \"Permission:{_itemTemplate.PluralEntityName}\": \"{_itemTemplate.PluralEntityName}\",\r\n"
-                    + $"    \"Permission:{_itemTemplate.PluralEntityName}.Create\": \"Create\",\r\n"
-                    + $"    \"Permission:{_itemTemplate.PluralEntityName}.Edit\": \"Edit\",\r\n"
-                    + $"    \"Permission:{_itemTemplate.PluralEntityName}.Delete\": \"Delete\",\r\n";
-                fileText = fileText.Replace(positionText, newText);
+                fileText = updateAction(fileText);
                 File.WriteAllText(filePath, fileText);
             }
         }
