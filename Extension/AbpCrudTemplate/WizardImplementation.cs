@@ -283,7 +283,7 @@ namespace AbpCrudTemplate
                 var positionText = @"//public const string MyPermission1 = GroupName + "".MyPermission1"";";
 
                 updatedText.AppendLine(positionText)
-                           .Append($@"public static class {_itemTemplate.PluralEntityName}")
+                           .Append("\t").Append($@"public static class {_itemTemplate.PluralEntityName}")
                            .Append("\t").AppendLine("{")
                            .Append("\t\t").AppendLine($@"public const string Default = GroupName + "".{_itemTemplate.PluralEntityName}"";")
                            .Append("\t\t").AppendLine($@"public const string Create = Default + "".Create"";")
