@@ -191,11 +191,11 @@ namespace AbpCrudTemplate
                 replacementsDictionary["$getlistdtoselect$"] = getListDtoSelect.ToString();
                 replacementsDictionary["$getlistfiltercondition$"] = getListFilterCondition.ToString();
 
-                UpdateDbContext(_itemTemplate);
-                UpdateAutoMapperProfile(_itemTemplate);
-                UpdatePermissions(_itemTemplate, replacementsDictionary);
-                UpdatePermissionDefinition(_itemTemplate);
-                UpdateLocalization(_itemTemplate);
+                UpdateDbContext();
+                UpdateAutoMapperProfile();
+                UpdatePermissions();
+                UpdatePermissionDefinition();
+                UpdateLocalization();
             }
             catch (Exception ex)
             {
@@ -233,97 +233,102 @@ namespace AbpCrudTemplate
             return _addProjectItem;
         }
 
-        private void UpdateDbContext(ItemTemplate _itemTemplate)
+        private void UpdateDbContext()
         {
             var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetDbContextPath(_itemTemplate.AppName);
-            if (File.Exists(filePath))
+            UpdateFile(filePath, fileText =>
             {
-                var fileText = File.ReadAllText(filePath);
+                var newText = new StringBuilder();
+                var importNamespace = new StringBuilder();
+                var nameSpace = @"namespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
+                var positionText = @"#region App Entities";
 
-                // Import namespace
-                var nameSpace = $"\nnamespace {_itemTemplate.RootNamespace}.EntityFrameworkCore;";
-                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r" + nameSpace;
-                fileText = fileText.Replace(nameSpace, importNamespace);
+                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .Append(nameSpace);
+                newText.AppendLine(positionText)
+                       .Append("\t\t").AppendLine($"public DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}}");
 
-                // Add dbset
-                var positionText = "#region App Entities";
-                var newText = positionText + $"\r\n\tpublic DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}} \r\n";
-                fileText = fileText.Replace(positionText, newText);
-                File.WriteAllText(filePath, fileText);
-            }
+                return fileText.Replace(nameSpace, importNamespace.ToString()).Replace(positionText, newText.ToString());
+            });
+
         }
 
-        private void UpdateAutoMapperProfile(ItemTemplate _itemTemplate)
+        private void UpdateAutoMapperProfile()
         {
-            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetAutoMapperProfilePath(_itemTemplate.AppName);
-            if (File.Exists(filePath))
+            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetAutoMapperProfilePath(_itemTemplate.AppName));
+            UpdateFile(filePath, fileText =>
             {
-                var fileText = File.ReadAllText(filePath);
+                var newText = new StringBuilder();
+                var importNamespace = new StringBuilder();
+                var nameSpace = $@"namespace {_itemTemplate.RootNamespace};";
+                var positionText = @"* into multiple profile classes for a better organization. */";
 
-                // Import namespace
-                var nameSpace = $"\nnamespace {_itemTemplate.RootNamespace};";
-                var importNamespace = $"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};\r\n" + nameSpace;
-                fileText = fileText.Replace(nameSpace, importNamespace);
+                importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
+                               .Append(nameSpace);
+                newText.AppendLine(positionText)
+                       .Append("\t\t").AppendLine($"CreateMap<CreateUpdate{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}>();")
+                       .Append("\t\t").Append($"CreateMap<{_itemTemplate.SafeItemName}, {_itemTemplate.SafeItemName}Dto>();");
 
-                var positionText = "* into multiple profile classes for a better organization. */";
-                var newText = positionText
-                    + $"\r\n\t\tCreateMap<CreateUpdate{_itemTemplate.SafeItemName}Dto, {_itemTemplate.SafeItemName}>();"
-                    + $"\r\n\t\tCreateMap<{_itemTemplate.SafeItemName}, {_itemTemplate.SafeItemName}Dto>();\r\n";
-                fileText = fileText.Replace(positionText, newText);
-                File.WriteAllText(filePath, fileText);
-            }
+                return fileText.Replace(nameSpace, importNamespace.ToString()).Replace(positionText, newText.ToString());
+            });
         }
 
-        private void UpdatePermissions(ItemTemplate _itemTemplate, Dictionary<string, string> replacementsDictionary)
+
+        private void UpdatePermissions()
         {
-            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionPath(_itemTemplate.AppName);
-            if (File.Exists(filePath))
+            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionPath(_itemTemplate.AppName));
+            UpdateFile(filePath, fileText =>
             {
-                var fileText = File.ReadAllText(filePath);
-                var positionText = "//public const string MyPermission1 = GroupName + \".MyPermission1\";";
-                var newText = positionText
-                    + $"\r\n    public static class {_itemTemplate.PluralEntityName}\r\n"
-                    + "    {\r\n"
-                    + $"        public const string Default = GroupName + \".{_itemTemplate.PluralEntityName}\";\r\n"
-                    + $"        public const string Create = Default + \".Create\";\r\n"
-                    + $"        public const string Edit = Default + \".Edit\";\r\n"
-                    + $"        public const string Delete = Default + \".Delete\";\r\n"
-                    + "    }\r\n";
-                fileText = fileText.Replace(positionText, newText);
-                File.WriteAllText(filePath, fileText);
-            }
+                var updatedText = new StringBuilder();
+                var positionText = @"//public const string MyPermission1 = GroupName + "".MyPermission1"";";
+
+                updatedText.Append("\t").AppendLine($@"	public static class {_itemTemplate.PluralEntityName}")
+                           .Append("\t").AppendLine("{")
+                           .Append("\t\t").AppendLine($@"public const string Default = GroupName + "".{_itemTemplate.PluralEntityName}"";")
+                           .Append("\t\t").AppendLine($@"public const string Create = Default + "".Create"";")
+                           .Append("\t\t").AppendLine($@"public const string Edit = Default + "".Edit"";")
+                           .Append("\t\t").AppendLine($@"public const string Delete = Default + "".Delete"";")
+                           .Append("\t").Append("}");
+
+                return fileText.ToString().Replace(positionText, updatedText.ToString());
+            });
         }
 
-        private void UpdatePermissionDefinition(ItemTemplate _itemTemplate)
+
+        private void UpdatePermissionDefinition()
         {
-            var filePath = _itemTemplate.SolutionDirectorySubPath + FilePath.GetPermissionDefinitionPath(_itemTemplate.AppName);
-            if (File.Exists(filePath))
+            var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionDefinitionPath(_itemTemplate.AppName));
+
+            UpdateFile(filePath, fileText =>
             {
-                var fileText = File.ReadAllText(filePath);
-                var positionText = $"//myGroup.AddPermission({_itemTemplate.AppName}Permissions.MyPermission1, L(\"Permission:MyPermission1\"));";
-                var newText = positionText
-                      + $"\r\n\t\tvar {_itemTemplate.PluralEntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(\"Permission:{_itemTemplate.PluralEntityName}\"));\r\n"
-                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(\"Permission:{_itemTemplate.PluralEntityName}.Create\"));\r\n"
-                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(\"Permission:{_itemTemplate.PluralEntityName}.Edit\"));\r\n"
-                      + $"        {_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(\"Permission:{_itemTemplate.PluralEntityName}.Delete\"));\r";
-                fileText = fileText.Replace(positionText, newText);
-                File.WriteAllText(filePath, fileText);
-            }
+                var updatedText = new StringBuilder();
+                var positionText = $@"//myGroup.AddPermission({_itemTemplate.AppName}Permissions.MyPermission1, L(""Permission:MyPermission1""));";
+
+                updatedText.AppendLine(positionText)
+                           .Append("\t\t").AppendLine($@"var {_itemTemplate.PluralEntityCamelCase}Permission = {_itemTemplate.AppNameCamelCase}Group.AddPermission({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Default, L(""Permission:{_itemTemplate.PluralEntityName}""));")
+                           .Append("\t\t").AppendLine($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Create, L(""Permission:{_itemTemplate.PluralEntityName}.Create""));")
+                           .Append("\t\t").AppendLine($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Edit, L(""Permission:{_itemTemplate.PluralEntityName}.Edit""));")
+                           .Append("\t\t").Append($@"{_itemTemplate.PluralEntityCamelCase}Permission.AddChild({_itemTemplate.AppName}Permissions.{_itemTemplate.PluralEntityName}.Delete, L(""Permission:{_itemTemplate.PluralEntityName}.Delete""));");
+               
+                return fileText.ToString().Replace(positionText, updatedText.ToString());
+            });
         }
 
-        private void UpdateLocalization(ItemTemplate _itemTemplate)
+        private void UpdateLocalization()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetLocalizationPath(_itemTemplate.AppName));
 
             UpdateFile(filePath, fileText =>
             {
-                var positionText = "\"Welcome\": \"Welcome\",";
                 var updatedText = new StringBuilder();
-                updatedText.AppendLine(positionText);
-                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}\": \"{_itemTemplate.PluralEntityName}\",");
-                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Create\": \"Create\",");
-                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Edit\": \"Edit\",");
-                updatedText.AppendLine($"    \"Permission:{_itemTemplate.PluralEntityName}.Delete\": \"Delete\",");
+                var positionText = @"""Welcome"": ""Welcome"",";
+
+                updatedText.AppendLine(positionText)
+                           .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}"": ""{_itemTemplate.PluralEntityName}"",")
+                           .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Create"": ""Create"",")
+                           .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Edit"": ""Edit"",")
+                           .Append("\t\t").Append($@"""Permission:{_itemTemplate.PluralEntityName}.Delete"": ""Delete"",");
+
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
