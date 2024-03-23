@@ -4,6 +4,7 @@
         <Identity Id="AbpCrudTemplate.b99957c6-f4ea-42f1-9c3f-2e64cad83827" Version="1.0" Language="en-US" Publisher="Bikendra Thapaliya" />
         <DisplayName>AbpCrudTemplate</DisplayName>
         <Description xml:space="preserve">Abp Crud Template with Wizard</Description>
+        <MoreInfo>https://github.com/thapaliyabikendra/Abp-Crud-Template-with-Wizard</MoreInfo>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
