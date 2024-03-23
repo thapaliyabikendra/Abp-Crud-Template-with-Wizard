@@ -33,73 +33,72 @@ namespace AbpCrudTemplate
         {
             try
             {
-                // Move Model.cs and ModelAppService.cs
-                // Check Dir
+                // Move Model.cs and ModelAppService.cs files
+                MoveFiles();
 
-                #region ModelAppService.cs
-                var applicationContractsPath = _itemTemplate.SolutionDirectorySubPath + Project.ApplicationContracts;
-                var appServiceFileName = $"{_itemTemplate.SafeItemName}AppService.cs";
-                var sourceAppServicePath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, appServiceFileName);
-                var appServicePath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Application, _itemTemplate.PluralEntityName);
-                var appServiceFilePath = Path.Combine(appServicePath, appServiceFileName);
-                if (!Directory.Exists(appServicePath))
-                {
-                    Directory.CreateDirectory(appServicePath);
-                }
-                if (!File.Exists(appServiceFilePath))
-                {
-                    File.Move(sourceAppServicePath, appServiceFilePath);
-                }
-                #endregion
-
-                #region Model.cs
-                var modelFileName = $"{_itemTemplate.SafeItemName}.cs";
-                var sourceModelPath = Path.Combine(applicationContractsPath, _itemTemplate.PluralEntityName, modelFileName);
-                var modelPath = _itemTemplate.SolutionDirectorySubPath + Path.Combine(Project.Domain, _itemTemplate.PluralEntityName);
-                var modelFilePath = Path.Combine(modelPath, modelFileName);
-                if (!Directory.Exists(modelPath))
-                {
-                    Directory.CreateDirectory(modelPath);
-                }
-                if (!File.Exists(modelFilePath))
-                {
-                    File.Move(sourceModelPath, modelFilePath);
-                }
-                #endregion
-
-                #region Migrations
+                // Migrations (Add migrations and Update database)
                 if (_inputForm.AddMigration)
                 {
-                    string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.PluralEntityName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
-                    string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
-
-                    // Create the process for executing the commands
-                    var process = new System.Diagnostics.Process();
-                    process.StartInfo.FileName = "cmd.exe";
-                    process.StartInfo.RedirectStandardInput = true;
-                    //process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.Start();
-
-                    // Execute the migration command
-                    process.StandardInput.WriteLine(migrationCommand);
-                    process.StandardInput.Flush();
-                    if (_inputForm.UpdateDatabase)
-                    {
-                        // Execute the update database command
-                        process.StandardInput.WriteLine(updateCommand);
-                        process.StandardInput.Flush();
-                    }
-                    process.StandardInput.Close();
-                    process.WaitForExit();
-                    //string output = process.StandardOutput.ReadToEnd();
+                    ExecuteMigrationCommands();
                 }
-                #endregion
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void MoveFiles()
+        {
+            // Move AppService from ApplicationContracts to Application
+            MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Project.ApplicationContracts, Project.Application);
+
+            // Move Model from ApplicationContracts to Domain
+            MoveFile($"{_itemTemplate.SafeItemName}.cs", Project.ApplicationContracts, Project.Domain);
+        }
+
+        private void MoveFile(string fileName, string sourceDirectory, string destinationDirectory)
+        {
+            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, sourceDirectory, _itemTemplate.PluralEntityName, fileName);
+            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, destinationDirectory, _itemTemplate.PluralEntityName, fileName);
+
+            if (File.Exists(sourceFilePath))
+            {
+                string directoryPath = Path.GetDirectoryName(destinationFilePath);
+                if (!Directory.Exists(directoryPath))
+                    Directory.CreateDirectory(directoryPath);
+
+                if (!File.Exists(destinationFilePath))
+                    File.Move(sourceFilePath, destinationFilePath);
+            }
+        }
+
+        private void ExecuteMigrationCommands()
+        {
+            string migrationCommand = $"dotnet ef migrations add \"added {_itemTemplate.PluralEntityName}\" --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+            string updateCommand = $"dotnet ef database update --context {_itemTemplate.AppName}DbContext --project src/{_itemTemplate.RootNamespace}.EntityFrameworkCore --startup-project src/{_itemTemplate.RootNamespace}.DbMigrator";
+
+            using (var process = new System.Diagnostics.Process())
+            {
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.RedirectStandardInput = true;
+                //process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+
+                process.StandardInput.WriteLine(migrationCommand);
+                process.StandardInput.Flush();
+
+                if (_inputForm.UpdateDatabase)
+                {
+                    process.StandardInput.WriteLine(updateCommand);
+                    process.StandardInput.Flush();
+                }
+
+                process.StandardInput.Close();
+                process.WaitForExit();
+                //string output = process.StandardOutput.ReadToEnd();
             }
         }
 
@@ -115,23 +114,8 @@ namespace AbpCrudTemplate
                     return;
                 }
 
-                var safeItemName = replacementsDictionary["$safeitemname$"];
-                if (string.IsNullOrWhiteSpace(_inputForm.PluralEntityName))
-                {
-                    _inputForm.PluralEntityName = $"{safeItemName}s";
-                }
-
-                _itemTemplate = new ItemTemplate
-                {
-                    SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
-                    RootNamespace = replacementsDictionary["$rootnamespace$"],
-                    AppName = _inputForm.AppName,
-                    AppNameCamelCase = ToCamelCase(_inputForm.AppName),
-                    SafeItemName = safeItemName,
-                    PluralEntityName = _inputForm.PluralEntityName,
-                    EntityCamelCase = ToCamelCase(safeItemName),
-                    PluralEntityCamelCase = ToCamelCase(_inputForm.PluralEntityName)
-                };
+                InitializeItemTemplate(replacementsDictionary);
+                UpdateDictionaries(replacementsDictionary);
 
                 var properties = new StringBuilder();
                 var createUpdateProperties = new StringBuilder();
@@ -177,7 +161,7 @@ namespace AbpCrudTemplate
 
                         if (propType == "string")
                         {
-                            getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.ToLower().Contains(filter.{propName}.ToLower()))");
+                            getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.Contains(filter.{propName}, StringComparison.OrdinalIgnoreCase))");
                         }
                         else
                         {
@@ -197,11 +181,6 @@ namespace AbpCrudTemplate
                 }
 
                 // Add custom parameters.
-                replacementsDictionary["$appname$"] = _itemTemplate.AppName;
-                replacementsDictionary["$appnamecamelcase$"] = _itemTemplate.AppNameCamelCase;
-                replacementsDictionary["$entitycamelcase$"] = _itemTemplate.EntityCamelCase;
-                replacementsDictionary["$pluralentityname$"] = _inputForm.PluralEntityName;
-                replacementsDictionary["$pluralcamelcaseentityname$"] = ToCamelCase(_inputForm.PluralEntityName);
                 replacementsDictionary["$properties$"] = properties.ToString();
                 replacementsDictionary["$createupdateproperties$"] = createUpdateProperties.ToString();
                 replacementsDictionary["$dtoproperties$"] = dtoProperties.ToString();
@@ -222,6 +201,31 @@ namespace AbpCrudTemplate
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void InitializeItemTemplate(Dictionary<string, string> replacementsDictionary)
+        {
+            var safeItemName = replacementsDictionary["$safeitemname$"];
+            _itemTemplate = new ItemTemplate
+            {
+                SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
+                RootNamespace = replacementsDictionary["$rootnamespace$"],
+                AppName = _inputForm.AppName,
+                AppNameCamelCase = ToCamelCase(_inputForm.AppName),
+                SafeItemName = safeItemName,
+                PluralEntityName = string.IsNullOrWhiteSpace(_inputForm.PluralEntityName) ? $"{safeItemName}s" : _inputForm.PluralEntityName,
+                EntityCamelCase = ToCamelCase(safeItemName),
+                PluralEntityCamelCase = ToCamelCase(_inputForm.PluralEntityName)
+            };
+        }
+
+        private void UpdateDictionaries(Dictionary<string, string> replacementsDictionary)
+        {
+            replacementsDictionary["$appname$"] = _itemTemplate.AppName;
+            replacementsDictionary["$appnamecamelcase$"] = _itemTemplate.AppNameCamelCase;
+            replacementsDictionary["$entitycamelcase$"] = _itemTemplate.EntityCamelCase;
+            replacementsDictionary["$pluralentityname$"] = _itemTemplate.PluralEntityName;
+            replacementsDictionary["$pluralcamelcaseentityname$"] = ToCamelCase(_itemTemplate.PluralEntityName);
         }
 
         public bool ShouldAddProjectItem(string filePath)

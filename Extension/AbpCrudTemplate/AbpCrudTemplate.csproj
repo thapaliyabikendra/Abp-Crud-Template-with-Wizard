@@ -75,6 +75,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="envdte">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Common Files\Microsoft Shared\MSEnv\PublicAssemblies\envdte.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.TemplateWizardInterface, Version=17.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
