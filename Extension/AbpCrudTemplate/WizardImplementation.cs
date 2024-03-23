@@ -167,8 +167,8 @@ namespace AbpCrudTemplate
         }
         private void MoveFile(string fileName, string sourceDirectory, string destinationDirectory)
         {
-            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, sourceDirectory, _itemTemplate.PluralEntityName, fileName);
-            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, destinationDirectory, _itemTemplate.PluralEntityName, fileName);
+            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath + sourceDirectory, _itemTemplate.PluralEntityName, fileName);
+            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath + destinationDirectory, _itemTemplate.PluralEntityName, fileName);
 
             if (File.Exists(sourceFilePath))
             {
@@ -282,7 +282,8 @@ namespace AbpCrudTemplate
                 var updatedText = new StringBuilder();
                 var positionText = @"//public const string MyPermission1 = GroupName + "".MyPermission1"";";
 
-                updatedText.AppendLine($@"public static class {_itemTemplate.PluralEntityName}")
+                updatedText.AppendLine(positionText)
+                           .Append($@"public static class {_itemTemplate.PluralEntityName}")
                            .Append("\t").AppendLine("{")
                            .Append("\t\t").AppendLine($@"public const string Default = GroupName + "".{_itemTemplate.PluralEntityName}"";")
                            .Append("\t\t").AppendLine($@"public const string Create = Default + "".Create"";")
