@@ -273,7 +273,6 @@ namespace AbpCrudTemplate
             });
         }
 
-
         private void UpdatePermissions()
         {
             var filePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath, FilePath.GetPermissionPath(_itemTemplate.AppName));
@@ -293,7 +292,6 @@ namespace AbpCrudTemplate
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
-
 
         private void UpdatePermissionDefinition()
         {
@@ -345,7 +343,7 @@ namespace AbpCrudTemplate
 
         private string ToCamelCase(string name)
         {
-            return Char.ToLowerInvariant(name[0]) + name.Substring(1);
+            return (name.Length < 1) ? "" :Char.ToLowerInvariant(name[0]) + name.Substring(1);
         }
     }
 }
