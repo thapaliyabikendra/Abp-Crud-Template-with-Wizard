@@ -36,6 +36,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.cbAddMigration = new System.Windows.Forms.CheckBox();
             this.cbUpdateDatabase = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -94,7 +95,7 @@
             // cbAddMigration
             // 
             this.cbAddMigration.AutoSize = true;
-            this.cbAddMigration.Location = new System.Drawing.Point(240, 141);
+            this.cbAddMigration.Location = new System.Drawing.Point(240, 150);
             this.cbAddMigration.Name = "cbAddMigration";
             this.cbAddMigration.Size = new System.Drawing.Size(112, 20);
             this.cbAddMigration.TabIndex = 10;
@@ -104,12 +105,22 @@
             // cbUpdateDatabase
             // 
             this.cbUpdateDatabase.AutoSize = true;
-            this.cbUpdateDatabase.Location = new System.Drawing.Point(240, 167);
+            this.cbUpdateDatabase.Location = new System.Drawing.Point(240, 176);
             this.cbUpdateDatabase.Name = "cbUpdateDatabase";
             this.cbUpdateDatabase.Size = new System.Drawing.Size(137, 20);
             this.cbUpdateDatabase.TabIndex = 11;
             this.cbUpdateDatabase.Text = "Update Database";
             this.cbUpdateDatabase.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(240, 119);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(145, 15);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "ex. DisplayName:string:R";
             // 
             // UserInputForm
             // 
@@ -118,6 +129,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(735, 321);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.cbUpdateDatabase);
             this.Controls.Add(this.cbAddMigration);
             this.Controls.Add(this.btnCancel);
@@ -143,5 +155,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox cbAddMigration;
         private System.Windows.Forms.CheckBox cbUpdateDatabase;
+        private System.Windows.Forms.Label label2;
     }
 }
