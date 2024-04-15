@@ -1,4 +1,4 @@
-﻿namespace AbpCrudTemplate
+﻿namespace AbpCrudTemplate.Wizard
 {
     partial class UserInputForm
     {
@@ -69,7 +69,7 @@
             this.txtProperties.Location = new System.Drawing.Point(240, 93);
             this.txtProperties.Name = "txtProperties";
             this.txtProperties.Size = new System.Drawing.Size(366, 22);
-            this.txtProperties.TabIndex = 4;
+            this.txtProperties.TabIndex = 6;
             // 
             // btnOk
             // 
@@ -139,7 +139,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label1);
             this.Name = "UserInputForm";
-            this.Text = "Entity Detail Form";
+            this.Text = "UserInputForm";
             this.ResumeLayout(false);
             this.PerformLayout();
 

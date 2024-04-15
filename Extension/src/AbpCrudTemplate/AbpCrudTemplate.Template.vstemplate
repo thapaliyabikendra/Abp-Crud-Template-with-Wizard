@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+	<TemplateData>
+		<Name>Abp Crud Template with Wizard</Name>
+		<Description>&lt;Abp Crud Template with Wizard&gt;</Description>
+		<Icon>AbpCrudTemplate.ico</Icon>
+		<TemplateID>fc1216e2-a620-4616-aeb7-2267ae84211b</TemplateID>
+		<ProjectType>CSharp</ProjectType>
+		<RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+		<NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+		<DefaultName>Class.cs</DefaultName>
+		<SortOrder>1</SortOrder>
+	</TemplateData>
+	<TemplateContent>
+		<References>
+			<Reference>
+				<Assembly>System</Assembly>
+			</Reference>
+		</References>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.cs" ReplaceParameters="true">Templates\Model.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">Templates\CreateUpdateModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Dto.cs" ReplaceParameters="true">Templates\ModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Filter.cs" ReplaceParameters="true">Templates\ModelFilter.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\I$fileinputname$AppService.cs" ReplaceParameters="true">Templates\IModelAppService.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$AppService.cs" ReplaceParameters="true">Templates\ModelAppService.cs.template</ProjectItem>
+		<CustomParameters>
+			<CustomParameter Name="$appname$" Value=""/>
+			<CustomParameter Name="$entitycamelcase$" Value=""/>
+			<CustomParameter Name="$pluralentityname$" Value=""/>
+			<CustomParameter Name="$pluralcamelcaseentityname$" Value=""/>
+
+			<CustomParameter Name="$properties$" Value=""/>
+			<CustomParameter Name="$createupdateproperties$" Value=""/>
+			<CustomParameter Name="$dtoproperties$" Value=""/>
+			<CustomParameter Name="$filterproperties$" Value=""/>
+
+			<CustomParameter Name="$getlistorderby$" Value=""/>
+			<CustomParameter Name="$getlistdtoselect$" Value=""/>
+			<CustomParameter Name="$getlistfiltercondition$" Value=""/>
+		</CustomParameters>
+	</TemplateContent>
+	<WizardExtension>
+		<Assembly>AbpCrudTemplate, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=2a58633276f59a17</Assembly>
+		<FullClassName>AbpCrudTemplate.WizardImplementation</FullClassName>
+	</WizardExtension>
+</VSTemplate>
+

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="AbpCrudTemplate.b99957c6-f4ea-42f1-9c3f-2e64cad83827" Version="1.0" Language="en-US" Publisher="Bikendra Thapaliya" />
-        <DisplayName>AbpCrudTemplate</DisplayName>
+        <Identity Id="AbpCrudTemplate.Wizard.1ad49c22-9161-4ba3-9918-e9b80efc42da" Version="2.0" Language="en-US" Publisher="Bikendra Thapaliya" />
+        <DisplayName>AbpCrudTemplate.Wizard</DisplayName>
         <Description xml:space="preserve">Abp Crud Template with Wizard</Description>
         <MoreInfo>https://github.com/thapaliyabikendra/Abp-Crud-Template-with-Wizard</MoreInfo>
     </Metadata>
@@ -14,11 +14,11 @@
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" AssemblyName="|%CurrentProject%;AssemblyName|" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="AbpCrudTemplate.Template" d:TargetPath="|AbpCrudTemplate.Template;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    </Assets>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
-    <Assets>
-        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="AbpCrudTemplate.Template" d:TargetPath="|AbpCrudTemplate.Template;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" AssemblyName="|%CurrentProject%;AssemblyName|" />
-    </Assets>
 </PackageManifest>

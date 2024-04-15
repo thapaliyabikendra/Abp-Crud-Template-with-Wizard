@@ -39,7 +39,7 @@ public class $safeitemname$: ApplicationService, I$fileinputname$AppService
     {
         try
         {
-            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Started::");
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetAsync - ::Started::");
 
             var $entitycamelcase$ = await _$entitycamelcase$Repository.FindAsync(s => s.Id == id);
             var response = ObjectMapper.Map <$fileinputname$, $fileinputname$Dto > ($entitycamelcase$);
@@ -48,12 +48,12 @@ public class $safeitemname$: ApplicationService, I$fileinputname$AppService
         }
         catch (Exception ex)
         {
-            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Exception:: - {ex.Message}");
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetAsync - ::Exception:: - {ex.Message}");
             throw new UserFriendlyException(ex.Message);
         }
         finally
         {
-            _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Ended::");
+            _logger.LogInformation($"::$fileinputname$AppService:: - GetAsync - ::Ended::");
         }
     }
 
@@ -109,7 +109,7 @@ public class $safeitemname$: ApplicationService, I$fileinputname$AppService
         {
             _logger.LogInformation($"::$fileinputname$AppService:: - CreateAsync - ::Started::");
 
-            var $entitycamelcase$ = ObjectMapper.Map < CreateUpdate$fileinputname$Dto, $fileinputname$> ($entitycamelcase$);
+            var $entitycamelcase$ = ObjectMapper.Map<CreateUpdate$fileinputname$Dto, $fileinputname$>(input);
             await _$entitycamelcase$Repository.InsertAsync($entitycamelcase$ );
 
             return true;
@@ -140,7 +140,7 @@ public class $safeitemname$: ApplicationService, I$fileinputname$AppService
                 throw new AbpValidationException(msg,
                     new List<ValidationResult>
                     {
-                                    new ValidationResult(msg, new []{ "id" })
+                        new ValidationResult(msg, new []{ "id" })
                     }
                 );
             }
@@ -176,12 +176,12 @@ public class $safeitemname$: ApplicationService, I$fileinputname$AppService
                 throw new AbpValidationException(msg,
                     new List<ValidationResult>
                     {
-                                    new ValidationResult(msg, new []{ "id" })
+                        new ValidationResult(msg, new []{ "id" })
                     }
                 );
             }
 
-            await _$entitycamelcase$Repository.UpdateAsync($entitycamelcase$);
+            await _$entitycamelcase$Repository.DeleteAsync(id);
 
             return true;
         }

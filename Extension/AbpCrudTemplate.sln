@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbpCrudTemplateWizard", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{65BA6B07-E6E6-42B9-8453-26A75A8C8DB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbpCrudTemplate", "src\AbpCrudTemplate\AbpCrudTemplate.csproj", "{9DBB5907-83D4-4350-B68F-824B03B3E83D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbpCrudTemplate.Template", "src\AbpCrudTemplate\AbpCrudTemplate.Template.csproj", "{9DBB5907-83D4-4350-B68F-824B03B3E83D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

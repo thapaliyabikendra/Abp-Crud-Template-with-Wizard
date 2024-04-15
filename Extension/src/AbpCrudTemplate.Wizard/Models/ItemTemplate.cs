@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AbpCrudTemplate.Models
+namespace AbpCrudTemplate.Wizard.Models
 {
     public class ItemTemplate
     {
@@ -26,7 +26,5 @@ namespace AbpCrudTemplate.Models
         public string EntityCamelCase { get; set; }
         public string PluralEntityName { get; set; }
         public string PluralEntityCamelCase { get; set; }
-        public string TempFolderName { get; set; }
-        public string ProjectName { get; set; }
     }
 }

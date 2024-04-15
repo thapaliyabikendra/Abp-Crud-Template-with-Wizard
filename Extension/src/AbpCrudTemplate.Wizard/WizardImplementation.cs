@@ -1,17 +1,15 @@
-﻿using AbpCrudTemplate.Constants;
-using AbpCrudTemplate.Models;
+﻿using AbpCrudTemplate.Wizard.Constants;
+using AbpCrudTemplate.Wizard.Models;
 using EnvDTE;
 using Microsoft.VisualStudio.TemplateWizard;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
-namespace AbpCrudTemplate
+namespace AbpCrudTemplate.Wizard
 {
     public class WizardImplementation : IWizard
     {
@@ -28,7 +26,6 @@ namespace AbpCrudTemplate
         }
         public void ProjectItemFinishedGenerating(ProjectItem projectItem)
         {
-            _itemTemplate.ProjectName = projectItem.ContainingProject.Name;
         }
         public void RunFinished()
         {
@@ -36,10 +33,8 @@ namespace AbpCrudTemplate
             {
                 if (_addProjectItem)
                 {
+                    // Move Model.cs and ModelAppService.cs files
                     MoveFiles();
-
-                    // Remove generated dir
-                    RemoveGeneratedDir();
 
                     // Migrations (Add migrations and Update database)
                     if (_inputForm.AddMigration)
@@ -86,54 +81,47 @@ namespace AbpCrudTemplate
                 // Properties input format: PropertyName:PropertyType[:IsRequired]
                 // ex. DisplayName:string:R
                 var propertiesData = _inputForm.Properties.Split(',');
-                var isFirstItem = true;
-                var requiredAttribute = "\t[Required]";
-                foreach (var prop in propertiesData.Select((item, index) => (item, index)))
+                foreach (var property in propertiesData)
                 {
-                    if (string.IsNullOrWhiteSpace(prop.item) || !prop.item.Contains(':')) {
-                        continue;
+                    var prop = property.Split(':');
+                    var propName = prop[0].Trim();
+                    var propType = prop[1].Trim();
+                    var isRequired = prop.Length > 2 && prop[2].Equals("R", StringComparison.OrdinalIgnoreCase);
+
+                    properties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                    if (isRequired)
+                    {
+                        createUpdateProperties.AppendLine("\t[Required]");
                     }
-
-                    var propData = prop.item.Split(':');
-                    var propName = propData[0]?.Trim();
-                    var propType = propData[1]?.Trim();
-                    var isRequired = propData.Length > 2 && propData[2].Equals("R", StringComparison.OrdinalIgnoreCase);
-                    var isLastItem = (prop.index == (propertiesData.Count() - 1));
-
-                    var property = $"\tpublic {propType} {propName} {{ get; set; }}";
-                    var createUpdateProperty = $"{property}";
-                    var nullablePropType = (!propType.Equals("string") && !propType.Contains("?")) ? $"{propType}?" : propType;
-                    var propertyFilter = $"\tpublic {nullablePropType} {propName} {{ get; set; }}";
-                    var getListDtoSelectField = $"\t\t\t\t\t\t\t\t{propName} = s.{propName},";
-                    var filterCondition = (propType == "string")
-                       ? $"\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.Contains(filter.{propName}, StringComparison.OrdinalIgnoreCase))"
-                       : $"\t\t\t\t\t\t.WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})";
+                    createUpdateProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                    dtoProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
 
                     if (string.IsNullOrWhiteSpace(getListOrderBy))
                     {
                         getListOrderBy = propName;
                     }
 
-                    if (isFirstItem || isFirstItem)
-                    {
-                        filterCondition = Environment.NewLine + filterCondition;
-                    }
+                    getListDtoSelect.AppendLine($"\t\t\t\t\t\t\t\t{propName} = s.{propName},");
 
-                    if (!isLastItem && !isFirstItem) {
-                        filterCondition += Environment.NewLine;
-                    }
-
-                    properties.Append(property);
-                    if (isRequired)
+                    if (propType == "string")
                     {
-                        createUpdateProperties.Append(requiredAttribute + Environment.NewLine);
+                        getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(!string.IsNullOrEmpty(filter.{propName}), s => s.{propName}.Contains(filter.{propName}, StringComparison.OrdinalIgnoreCase))");
                     }
-                    createUpdateProperties.Append(property);
-                    dtoProperties.Append(property);
-                    filterProperties.Append(propertyFilter);
-                    getListDtoSelect.Append(getListDtoSelectField);
-                    getListFilterCondition.Append(filterCondition);
-                    isFirstItem = false;
+                    else
+                    {
+                        getListFilterCondition.AppendLine($"\t\t\t\t\t\t\t\t.WhereIf(filter.{propName} != null, s => s.{propName} == filter.{propName})");
+                        if (!propType.Contains("?"))
+                        {
+                            propType += "?";
+                        }
+                    }
+                    filterProperties.AppendLine($"\tpublic {propType} {propName} {{ get; set; }}");
+                }
+
+                // set order by to  CreationTime desc if prop not found
+                if (string.IsNullOrWhiteSpace(getListOrderBy))
+                {
+                    getListOrderBy = "CreationTime desc";
                 }
 
                 // Add custom parameters.
@@ -164,36 +152,17 @@ namespace AbpCrudTemplate
         #endregion
 
         #region Private Methods
-        private void RemoveGeneratedDir()
-        {
-            var directoryPath = Path.Combine(_itemTemplate.SolutionDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName);
-            if (Directory.Exists(directoryPath))
-            {
-                bool hasFiles = Directory.GetFiles(directoryPath).Length > 0;
-                if (!hasFiles)
-                {
-                    Directory.Delete(directoryPath);
-                }
-            }
-        }
-
         private void MoveFiles()
         {
-            // Move Domain
-            MoveFile($"{_itemTemplate.SafeItemName}.cs", Constants.Project.Domain);
+            // Move AppService from ApplicationContracts to Application
+            MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Constants.Project.ApplicationContracts, Constants.Project.Application);
 
-            // Move to Application Contracts
-            MoveFile($"{_itemTemplate.SafeItemName}Dto.cs", Constants.Project.ApplicationContracts);
-            MoveFile($"{_itemTemplate.SafeItemName}Filter.cs", Constants.Project.ApplicationContracts);
-            MoveFile($"CreateUpdate{_itemTemplate.SafeItemName}Dto.cs", Constants.Project.ApplicationContracts);
-            MoveFile($"I{_itemTemplate.SafeItemName}AppService.cs", Constants.Project.ApplicationContracts);
-
-            // Move to Application
-            MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Constants.Project.Application);
+            // Move Model from ApplicationContracts to Domain
+            MoveFile($"{_itemTemplate.SafeItemName}.cs", Constants.Project.ApplicationContracts, Constants.Project.Domain);
         }
-        private void MoveFile(string fileName, string destinationDirectory)
+        private void MoveFile(string fileName, string sourceDirectory, string destinationDirectory)
         {
-            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName, fileName);
+            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath + sourceDirectory, _itemTemplate.PluralEntityName, fileName);
             var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath + destinationDirectory, _itemTemplate.PluralEntityName, fileName);
 
             if (File.Exists(sourceFilePath))
@@ -236,21 +205,19 @@ namespace AbpCrudTemplate
         }
         private void InitializeItemTemplate(Dictionary<string, string> replacementsDictionary)
         {
-            var appName = replacementsDictionary["$defaultnamespace$"]?.Split('.')?.LastOrDefault();
             var safeItemName = replacementsDictionary["$safeitemname$"];
+            var appName = replacementsDictionary["$defaultnamespace$"]?.Split('.')?.LastOrDefault();
             var pluralEntityName = string.IsNullOrWhiteSpace(_inputForm.PluralEntityName) ? $"{safeItemName}s" : _inputForm.PluralEntityName;
 
             _itemTemplate = new ItemTemplate
             {
                 AppName = appName,
-                AppNameCamelCase = ToCamelCase(appName),
                 RootNamespace = replacementsDictionary["$rootnamespace$"],
                 SolutionDirectory = replacementsDictionary["$solutiondirectory$"],
                 SafeItemName = safeItemName,
                 EntityCamelCase = ToCamelCase(safeItemName),
                 PluralEntityName = pluralEntityName,
-                PluralEntityCamelCase = ToCamelCase(pluralEntityName),
-                TempFolderName = replacementsDictionary["$guid1$"]
+                PluralEntityCamelCase = ToCamelCase(pluralEntityName)
             };
         }
         private void UpdateDictionaries(Dictionary<string, string> replacementsDictionary)
