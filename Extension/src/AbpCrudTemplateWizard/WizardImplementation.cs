@@ -19,11 +19,11 @@ namespace AbpCrudTemplate
         private bool _addProjectItem = true;
         private ItemTemplate _itemTemplate;
         private string[] _angularTemplateFiles = new string[] {
-                    "model-routing.module.ts",
-                    "model.component.scss",
-                    "model.component.html",
-                    "model.component.ts",
-                    "model.module.ts"
+                    @"Templates\UI\model-routing.module.ts.template",
+                    @"Templates\UI\model.component.ts.template",
+                    @"Templates\UI\model.component.scss.template",
+                    @"Templates\UI\model.component.html.template",
+                    @"Templates\UI\model.module.ts.template"
                 };
         private bool _shouldGenerateAngularFiles = false;
 
@@ -107,7 +107,8 @@ namespace AbpCrudTemplate
                 var requiredAttribute = "\t[Required]";
                 foreach (var prop in propertiesData.Select((item, index) => (item, index)))
                 {
-                    if (string.IsNullOrWhiteSpace(prop.item) || !prop.item.Contains(':')) {
+                    if (string.IsNullOrWhiteSpace(prop.item) || !prop.item.Contains(':'))
+                    {
                         continue;
                     }
 
@@ -142,7 +143,8 @@ namespace AbpCrudTemplate
                         filterCondition = Environment.NewLine + filterCondition;
                     }
 
-                    if (!isLastItem && !isFirstItem) {
+                    if (!isLastItem && !isFirstItem)
+                    {
                         filterCondition += Environment.NewLine;
                     }
 
@@ -157,7 +159,8 @@ namespace AbpCrudTemplate
                     getListDtoSelect.Append(getListDtoSelectField);
                     getListFilterCondition.Append(filterCondition);
 
-                    if (_shouldGenerateAngularFiles) {
+                    if (_shouldGenerateAngularFiles)
+                    {
                         buildFormProperties.AppendLine($"\t\t\t{propNameCamelCase}: [this.selected.{propNameCamelCase}{(isRequired ? ", Validators.required" : "")}],");
                         saveFormProperties.AppendLine($"\t\t\t{propNameCamelCase}: this.form.get(\"{propNameCamelCase}\").value,");
 
@@ -200,7 +203,10 @@ namespace AbpCrudTemplate
                 UpdatePermissionDefinition();
                 UpdateLocalization();
 
-                UpdateUIAppRouting();
+                if (_shouldGenerateAngularFiles)
+                {
+                    UpdateUIAppRouting();
+                }
             }
             catch (Exception ex)
             {
@@ -233,7 +239,11 @@ namespace AbpCrudTemplate
         private void MoveFiles()
         {
             MoveAPIFiles();
-            MoveUIFiles();
+
+            if (_shouldGenerateAngularFiles)
+            {
+                MoveUIFiles();
+            }
         }
         private void MoveAPIFiles()
         {
