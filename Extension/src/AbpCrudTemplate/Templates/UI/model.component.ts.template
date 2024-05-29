@@ -1,0 +1,98 @@
+import { $safeitemname$Filter } from './../proxy/$entitycamelcase$s/models';
+import { ListService, PagedResultDto } from '@abp/ng.core';
+import { Confirmation, ConfirmationService, ToasterService } from '@abp/ng.theme.shared';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { $safeitemname$Service, $safeitemname$Dto, CreateUpdate$safeitemname$Dto } from '@proxy/$entitycamelcase$s';
+
+@Component({
+  selector: 'app-$entitycamelcase$',
+  templateUrl: './$entitycamelcase$.component.html',
+  styleUrls: ['./$entitycamelcase$.component.scss'],
+  providers: [ListService],
+})
+export class $safeitemname$Component implements OnInit  {
+  data = { items: [], totalCount: 0 } as PagedResultDto<$safeitemname$Dto>;
+  form: FormGroup;
+  selected = {} as $safeitemname$Dto;
+  isModalOpen = false;
+  filter: $safeitemname$Filter = {};
+  filterHideShow = false;
+
+  constructor(public readonly list: ListService,
+    private service: $safeitemname$Service,
+    private fb: FormBuilder,
+    private confirmation: ConfirmationService,
+    private toast: ToasterService) {}
+
+  ngOnInit() {
+    this.getData();
+  }
+
+  getData(){
+    const streamCreator = (query) => this.service.getListByFilter(query, this.filter);
+    this.list.hookToQuery(streamCreator).subscribe((response) => {
+      this.data = response;
+    });
+  }
+
+  toggleFilter(){
+    this.filterHideShow = !this.filterHideShow;
+  }
+
+  create() {
+    this.selected = {} as $safeitemname$Dto;
+    this.buildForm();
+    this.isModalOpen = true;
+  }
+
+  edit(id: string) {
+    this.service.get(id).subscribe((asset) => {
+      this.selected = asset;
+      this.buildForm();
+      this.isModalOpen = true;
+    });
+  }
+
+  buildForm() {
+    this.form = this.fb.group({
+      $buildFormProperties$
+    });
+  }
+
+  save() {
+    if (this.form.invalid) {
+      return;
+    }
+    const dto: CreateUpdate$safeitemname$Dto = {
+      $saveFormProperties$
+    };
+    const request = this.selected.id
+      ? this.service.update(this.selected.id, dto)
+      : this.service.create(dto);
+
+    request.subscribe(() => {
+      this.toast.success(this.selected.id?'::$safeitemname$Updated':'::$safeitemname$Created', "::SUCCESS", {
+        tapToDismiss: true,
+        life: 2500
+      });
+      this.isModalOpen = false;
+      this.form.reset();
+      this.list.get();
+    });
+  }
+
+  delete(id: string) {
+    this.confirmation.warn('::PressOKToContinue', 'AbpAccount::AreYouSure').subscribe((status) => {
+      if (status === Confirmation.Status.confirm) {
+        this.service.delete(id).subscribe(() => {
+          this.toast.success('::$safeitemname$Deleted', "::SUCCESS", {
+            tapToDismiss: true,
+            life: 2500
+          });
+          this.list.get();
+        });
+      }
+    });
+  }
+}

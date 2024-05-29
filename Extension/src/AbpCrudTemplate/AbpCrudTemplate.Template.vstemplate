@@ -17,12 +17,19 @@
 				<Assembly>System</Assembly>
 			</Reference>
 		</References>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.cs" ReplaceParameters="true">Templates\Model.cs.template</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">Templates\CreateUpdateModelDto.cs.template</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Dto.cs" ReplaceParameters="true">Templates\ModelDto.cs.template</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Filter.cs" ReplaceParameters="true">Templates\ModelFilter.cs.template</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\I$fileinputname$AppService.cs" ReplaceParameters="true">Templates\IModelAppService.cs.template</ProjectItem>
-		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$AppService.cs" ReplaceParameters="true">Templates\ModelAppService.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.cs" ReplaceParameters="true">Templates\API\Model.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\CreateUpdate$fileinputname$Dto.cs" ReplaceParameters="true">Templates\API\CreateUpdateModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Dto.cs" ReplaceParameters="true">Templates\API\ModelDto.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$Filter.cs" ReplaceParameters="true">Templates\API\ModelFilter.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\I$fileinputname$AppService.cs" ReplaceParameters="true">Templates\API\IModelAppService.cs.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$AppService.cs" ReplaceParameters="true">Templates\API\ModelAppService.cs.template</ProjectItem>
+
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$-routing.module.ts" ReplaceParameters="true">Templates\UI\model-routing.module.ts.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.component.scss" ReplaceParameters="true">Templates\UI\model.component.scss.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.component.html" ReplaceParameters="true">Templates\UI\model.component.html.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.component.ts" ReplaceParameters="true">Templates\UI\model.component.ts.template</ProjectItem>
+		<ProjectItem SubType="" TargetFileName="\$guid1$\$fileinputname$.module.ts" ReplaceParameters="true">Templates\UI\model.module.ts.template</ProjectItem>
+
 		<CustomParameters>
 			<CustomParameter Name="$appname$" Value=""/>
 			<CustomParameter Name="$entitycamelcase$" Value=""/>
@@ -37,6 +44,12 @@
 			<CustomParameter Name="$getlistorderby$" Value=""/>
 			<CustomParameter Name="$getlistdtoselect$" Value=""/>
 			<CustomParameter Name="$getlistfiltercondition$" Value=""/>
+
+			<CustomParameter Name="$buildFormProperties$" Value=""/>
+			<CustomParameter Name="$saveFormProperties$" Value=""/>
+			<CustomParameter Name="$filterInputs$" Value=""/>
+			<CustomParameter Name="$gridColumns$" Value=""/>
+			<CustomParameter Name="$formInputs$" Value=""/>
 		</CustomParameters>
 	</TemplateContent>
 	<WizardExtension>

@@ -18,6 +18,14 @@ namespace AbpCrudTemplate
         private UserInputForm _inputForm;
         private bool _addProjectItem = true;
         private ItemTemplate _itemTemplate;
+        private string[] _angularTemplateFiles = new string[] {
+                    "model-routing.module.ts",
+                    "model.component.scss",
+                    "model.component.html",
+                    "model.component.ts",
+                    "model.module.ts"
+                };
+        private bool _shouldGenerateAngularFiles = false;
 
         #region Public Methods
         public void BeforeOpeningFile(ProjectItem projectItem)
@@ -65,8 +73,16 @@ namespace AbpCrudTemplate
                     return;
                 }
 
+                if (string.IsNullOrWhiteSpace(_inputForm.Properties))
+                {
+                    MessageBox.Show("Enter Properties");
+                    return;
+                }
+
                 InitializeItemTemplate(replacementsDictionary);
                 UpdateDictionaries(replacementsDictionary);
+
+                _shouldGenerateAngularFiles = _inputForm.GenerateAngularFiles;
 
                 var properties = new StringBuilder();
                 var createUpdateProperties = new StringBuilder();
@@ -77,11 +93,12 @@ namespace AbpCrudTemplate
                 var getListFilterCondition = new StringBuilder();
                 var getListOrderBy = "";
 
-                if (string.IsNullOrWhiteSpace(_inputForm.Properties))
-                {
-                    MessageBox.Show("Enter Properties");
-                    return;
-                }
+                // angular
+                var buildFormProperties = new StringBuilder();
+                var saveFormProperties = new StringBuilder();
+                var filterInputs = new StringBuilder();
+                var gridColumns = new StringBuilder();
+                var formInputs = new StringBuilder();
 
                 // Properties input format: PropertyName:PropertyType[:IsRequired]
                 // ex. DisplayName:string:R
@@ -97,11 +114,17 @@ namespace AbpCrudTemplate
                     var propData = prop.item.Split(':');
                     var propName = propData[0]?.Trim();
                     var propType = propData[1]?.Trim();
+                    var propNameCamelCase = ToCamelCase(propName);
+
+                    if (propType is null)
+                    {
+                        continue;
+                    }
+
                     var isRequired = propData.Length > 2 && propData[2].Equals("R", StringComparison.OrdinalIgnoreCase);
                     var isLastItem = (prop.index == (propertiesData.Count() - 1));
 
                     var property = $"\tpublic {propType} {propName} {{ get; set; }}";
-                    var createUpdateProperty = $"{property}";
                     var nullablePropType = (!propType.Equals("string") && !propType.Contains("?")) ? $"{propType}?" : propType;
                     var propertyFilter = $"\tpublic {nullablePropType} {propName} {{ get; set; }}";
                     var getListDtoSelectField = $"\t\t\t\t\t\t\t\t{propName} = s.{propName},";
@@ -114,7 +137,7 @@ namespace AbpCrudTemplate
                         getListOrderBy = propName;
                     }
 
-                    if (isFirstItem || isFirstItem)
+                    if (isFirstItem)
                     {
                         filterCondition = Environment.NewLine + filterCondition;
                     }
@@ -133,6 +156,25 @@ namespace AbpCrudTemplate
                     filterProperties.Append(propertyFilter);
                     getListDtoSelect.Append(getListDtoSelectField);
                     getListFilterCondition.Append(filterCondition);
+
+                    if (_shouldGenerateAngularFiles) {
+                        buildFormProperties.AppendLine($"\t\t\t{propNameCamelCase}: [this.selected.{propNameCamelCase}{(isRequired ? ", Validators.required" : "")}],");
+                        saveFormProperties.AppendLine($"\t\t\t{propNameCamelCase}: this.form.get(\"{propNameCamelCase}\").value,");
+
+                        var filterInput = $"\t\t\t<div class=\"col-md-2 form-group mb-1\">\r\n" +
+                                          $"\t\t\t\t<label for=\"filter-{propNameCamelCase}\">{{ '::{propName}' | abpLocalization }}</label>\r\n" +
+                                          $"\t\t\t\t<input type=\"text\" class=\"form-control\" [(ngModel)]=\"filter.{propNameCamelCase}\" id=\"filter-{propNameCamelCase}\" />\r\n" +
+                                          $"\t\t\t</div>";
+                        var gridColumn = $"\t\t\t<ngx-datatable-column [name]=\"'::{propName}' | abpLocalization\" prop=\"{propNameCamelCase}\"></ngx-datatable-column>";
+                        var formInput = $"<div class=\"form-group\">\r\n" +
+                            $"\t\t\t\t<label for=\"{propNameCamelCase}\">{{'::{propName}' | abpLocalization}}</label>{(isRequired ? "<span> * </span>" : "")}\r\n" +
+                            $"\t\t\t\t<input type=\"text\" id=\"{propNameCamelCase}\" class=\"form-control\" formControlName=\"{propNameCamelCase}\" />\r\n" +
+                            $"\t\t\t</div>";
+
+                        filterInputs.AppendLine(filterInput);
+                        gridColumns.AppendLine(gridColumn);
+                        formInputs.AppendLine(formInput);
+                    }
                     isFirstItem = false;
                 }
 
@@ -146,11 +188,19 @@ namespace AbpCrudTemplate
                 replacementsDictionary["$getlistdtoselect$"] = getListDtoSelect.ToString();
                 replacementsDictionary["$getlistfiltercondition$"] = getListFilterCondition.ToString();
 
+                replacementsDictionary["$buildFormProperties$"] = buildFormProperties.ToString();
+                replacementsDictionary["$saveFormProperties$"] = saveFormProperties.ToString();
+                replacementsDictionary["$filterInputs$"] = filterInputs.ToString();
+                replacementsDictionary["$gridColumns$"] = gridColumns.ToString();
+                replacementsDictionary["$formInputs$"] = formInputs.ToString();
+
                 UpdateDbContext();
                 UpdateAutoMapperProfile();
                 UpdatePermissions();
                 UpdatePermissionDefinition();
                 UpdateLocalization();
+
+                UpdateUIAppRouting();
             }
             catch (Exception ex)
             {
@@ -159,6 +209,10 @@ namespace AbpCrudTemplate
         }
         public bool ShouldAddProjectItem(string filePath)
         {
+            if (!_shouldGenerateAngularFiles && _angularTemplateFiles.Contains(filePath)) {
+                return false;
+            }
+
             return _addProjectItem;
         }
         #endregion
@@ -166,7 +220,7 @@ namespace AbpCrudTemplate
         #region Private Methods
         private void RemoveGeneratedDir()
         {
-            var directoryPath = Path.Combine(_itemTemplate.SolutionDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName);
+            var directoryPath = Path.Combine(_itemTemplate.SolutionSourceDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName);
             if (Directory.Exists(directoryPath))
             {
                 bool hasFiles = Directory.GetFiles(directoryPath).Length > 0;
@@ -176,10 +230,14 @@ namespace AbpCrudTemplate
                 }
             }
         }
-
         private void MoveFiles()
         {
-            // Move Domain
+            MoveAPIFiles();
+            MoveUIFiles();
+        }
+        private void MoveAPIFiles()
+        {
+            // Move to Domain
             MoveFile($"{_itemTemplate.SafeItemName}.cs", Constants.Project.Domain);
 
             // Move to Application Contracts
@@ -191,10 +249,21 @@ namespace AbpCrudTemplate
             // Move to Application
             MoveFile($"{_itemTemplate.SafeItemName}AppService.cs", Constants.Project.Application);
         }
-        private void MoveFile(string fileName, string destinationDirectory)
+        private void MoveUIFiles()
         {
-            var sourceFilePath = Path.Combine(_itemTemplate.SolutionDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName, fileName);
-            var destinationFilePath = Path.Combine(_itemTemplate.SolutionDirectorySubPath + destinationDirectory, _itemTemplate.PluralEntityName, fileName);
+            // Move to angular
+            var angularAppPath = Path.Combine(Constants.Project.Angular, "src", "app");
+            MoveFile($"{_itemTemplate.EntityCamelCase}-routing.module.ts", angularAppPath, isUI: true);
+            MoveFile($"{_itemTemplate.EntityCamelCase}.component.scss", angularAppPath, isUI: true);
+            MoveFile($"{_itemTemplate.EntityCamelCase}.component.html", angularAppPath, isUI: true);
+            MoveFile($"{_itemTemplate.EntityCamelCase}.component.ts", angularAppPath, isUI: true);
+            MoveFile($"{_itemTemplate.EntityCamelCase}.module.ts", angularAppPath, isUI: true);
+        }
+        private void MoveFile(string fileName, string destinationDirectory, bool isUI = false)
+        {
+            var sourceFilePath = Path.Combine(_itemTemplate.SolutionSourceDirectory, _itemTemplate.ProjectName, _itemTemplate.TempFolderName, fileName);
+            var destinationFilePath = isUI ? Path.Combine(_itemTemplate.ProjectDirectory, destinationDirectory, fileName)
+                                           : Path.Combine(_itemTemplate.SolutionDirectorySubPath + destinationDirectory, _itemTemplate.PluralEntityName, fileName);
 
             if (File.Exists(sourceFilePath))
             {
@@ -274,7 +343,8 @@ namespace AbpCrudTemplate
                 importNamespace.AppendLine($"using {_itemTemplate.RootNamespace}.{_itemTemplate.PluralEntityName};")
                                .Append(nameSpace);
                 newText.AppendLine($"public DbSet<{_itemTemplate.SafeItemName}> {_itemTemplate.PluralEntityName} {{ get; set;}}")
-                       .Append("\t").Append(positionText);
+                       .Append("\t")
+                       .Append(positionText);
 
                 return fileText.Replace(nameSpace, importNamespace.ToString()).Replace(positionText, newText.ToString());
             });
@@ -351,6 +421,22 @@ namespace AbpCrudTemplate
                            .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Create"": ""Create"",")
                            .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Edit"": ""Edit"",")
                            .Append("\t\t").Append($@"""Permission:{_itemTemplate.PluralEntityName}.Delete"": ""Delete"",");
+
+                return fileText.ToString().Replace(positionText, updatedText.ToString());
+            });
+        }
+        private void UpdateUIAppRouting()
+        {
+            var filePath = Path.Combine(_itemTemplate.ProjectDirectory, Constants.Project.Angular, "src", "app", $"app-routing.module.ts");
+
+            UpdateFile(filePath, fileText =>
+            {
+                var updatedText = new StringBuilder();
+                var positionText = @"];";
+
+                updatedText.AppendLine(", {path: routeUrl." + _itemTemplate.SafeItemName.ToUpper() + ", loadChildren: () => import('./" + _itemTemplate.EntityCamelCase + "/" + _itemTemplate.EntityCamelCase + ".module').then(m => m." + _itemTemplate.SafeItemName + "Module)}")
+                           .Append("\t")
+                           .AppendLine(positionText);
 
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });

@@ -8,5 +8,6 @@
         public readonly static string DbMigrator = ".DbMigrator";
         public readonly static string EntityFrameworkCore = ".EntityFrameworkCore";
         public readonly static string DomainShared = $"{Domain}.Shared";
+        public readonly static string Angular = $"angular";
     }
 }

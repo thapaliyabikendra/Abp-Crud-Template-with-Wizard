@@ -1,0 +1,19 @@
+import { SharedModule } from './../shared/shared.module';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { $safeitemname$RoutingModule } from './$entitycamelcase$-routing.module';
+import { $safeitemname$Component } from './$entitycamelcase$.component';
+
+
+@NgModule({
+  declarations: [
+    $safeitemname$Component
+  ],
+  imports: [
+    CommonModule,
+    $safeitemname$RoutingModule,
+    SharedModule
+  ]
+})
+export class $safeitemname$Module { }

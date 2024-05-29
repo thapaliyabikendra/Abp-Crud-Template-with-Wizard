@@ -37,6 +37,7 @@
             this.cbAddMigration = new System.Windows.Forms.CheckBox();
             this.cbUpdateDatabase = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.cbGenerateAngularFiles = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -95,7 +96,7 @@
             // cbAddMigration
             // 
             this.cbAddMigration.AutoSize = true;
-            this.cbAddMigration.Location = new System.Drawing.Point(240, 150);
+            this.cbAddMigration.Location = new System.Drawing.Point(240, 174);
             this.cbAddMigration.Name = "cbAddMigration";
             this.cbAddMigration.Size = new System.Drawing.Size(112, 20);
             this.cbAddMigration.TabIndex = 10;
@@ -105,7 +106,7 @@
             // cbUpdateDatabase
             // 
             this.cbUpdateDatabase.AutoSize = true;
-            this.cbUpdateDatabase.Location = new System.Drawing.Point(240, 176);
+            this.cbUpdateDatabase.Location = new System.Drawing.Point(240, 200);
             this.cbUpdateDatabase.Name = "cbUpdateDatabase";
             this.cbUpdateDatabase.Size = new System.Drawing.Size(137, 20);
             this.cbUpdateDatabase.TabIndex = 11;
@@ -118,9 +119,19 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(240, 119);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(145, 15);
+            this.label2.Size = new System.Drawing.Size(125, 13);
             this.label2.TabIndex = 12;
             this.label2.Text = "ex. DisplayName:string:R";
+            // 
+            // cbGenerateAngularFiles
+            // 
+            this.cbGenerateAngularFiles.AutoSize = true;
+            this.cbGenerateAngularFiles.Location = new System.Drawing.Point(240, 148);
+            this.cbGenerateAngularFiles.Name = "cbGenerateAngularFiles";
+            this.cbGenerateAngularFiles.Size = new System.Drawing.Size(166, 20);
+            this.cbGenerateAngularFiles.TabIndex = 13;
+            this.cbGenerateAngularFiles.Text = "Generate Angular Files";
+            this.cbGenerateAngularFiles.UseVisualStyleBackColor = true;
             // 
             // UserInputForm
             // 
@@ -129,6 +140,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(735, 321);
+            this.Controls.Add(this.cbGenerateAngularFiles);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbUpdateDatabase);
             this.Controls.Add(this.cbAddMigration);
@@ -156,5 +168,6 @@
         private System.Windows.Forms.CheckBox cbAddMigration;
         private System.Windows.Forms.CheckBox cbUpdateDatabase;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox cbGenerateAngularFiles;
     }
 }

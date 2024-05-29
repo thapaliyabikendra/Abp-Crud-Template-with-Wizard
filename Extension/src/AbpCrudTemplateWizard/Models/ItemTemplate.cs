@@ -4,22 +4,23 @@ namespace AbpCrudTemplate.Models
 {
     public class ItemTemplate
     {
-        private string _solutionDirectory;
+        public string SolutionDirectory { get; set; }
+        public string ProjectDirectory { get { return Directory.GetParent(Directory.GetParent(SolutionDirectory)?.FullName)?.FullName; } }
 
-        public string SolutionDirectory
+        public string SolutionSourceDirectory
         {
-            get { return Path.Combine(_solutionDirectory, "src"); }
-            set { _solutionDirectory = value; }
+            get { return Path.Combine(SolutionDirectory, "src"); }
         }
+        public string RootNamespace { get; set; }
 
         public string SolutionDirectorySubPath
         {
             get
             {
-                return Path.Combine(this.SolutionDirectory, this.RootNamespace);
+                return Path.Combine(this.SolutionSourceDirectory, this.RootNamespace);
             }
         }
-        public string RootNamespace { get; set; }
+
         public string AppName { get; set; }
         public string AppNameCamelCase { get; set; }
         public string SafeItemName { get; set; }
