@@ -47,8 +47,8 @@ export class $safeitemname$Component implements OnInit  {
   }
 
   edit(id: string) {
-    this.service.get(id).subscribe((asset) => {
-      this.selected = asset;
+    this.service.get(id).subscribe((data) => {
+      this.selected = data;
       this.buildForm();
       this.isModalOpen = true;
     });

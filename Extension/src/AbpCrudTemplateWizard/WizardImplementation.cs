@@ -165,12 +165,12 @@ namespace AbpCrudTemplate
                         saveFormProperties.AppendLine($"\t\t\t{propNameCamelCase}: this.form.get(\"{propNameCamelCase}\").value,");
 
                         var filterInput = $"\t\t\t<div class=\"col-md-2 form-group mb-1\">\r\n" +
-                                          $"\t\t\t\t<label for=\"filter-{propNameCamelCase}\">{{ '::{propName}' | abpLocalization }}</label>\r\n" +
+                                          $"\t\t\t\t<label for=\"filter-{propNameCamelCase}\">{{{{ '::{propName}' | abpLocalization }}}}</label>\r\n" +
                                           $"\t\t\t\t<input type=\"text\" class=\"form-control\" [(ngModel)]=\"filter.{propNameCamelCase}\" id=\"filter-{propNameCamelCase}\" />\r\n" +
                                           $"\t\t\t</div>";
                         var gridColumn = $"\t\t\t<ngx-datatable-column [name]=\"'::{propName}' | abpLocalization\" prop=\"{propNameCamelCase}\"></ngx-datatable-column>";
                         var formInput = $"<div class=\"form-group\">\r\n" +
-                            $"\t\t\t\t<label for=\"{propNameCamelCase}\">{{'::{propName}' | abpLocalization}}</label>{(isRequired ? "<span> * </span>" : "")}\r\n" +
+                            $"\t\t\t\t<label for=\"{propNameCamelCase}\">{{{{'::{propName}' | abpLocalization }}}}</label>{(isRequired ? "<span> * </span>" : "")}\r\n" +
                             $"\t\t\t\t<input type=\"text\" id=\"{propNameCamelCase}\" class=\"form-control\" formControlName=\"{propNameCamelCase}\" />\r\n" +
                             $"\t\t\t</div>";
 
@@ -206,6 +206,7 @@ namespace AbpCrudTemplate
                 if (_shouldGenerateAngularFiles)
                 {
                     UpdateUIAppRouting();
+                    UpdateUIRouteProvider();
                 }
             }
             catch (Exception ex)
@@ -262,7 +263,7 @@ namespace AbpCrudTemplate
         private void MoveUIFiles()
         {
             // Move to angular
-            var angularAppPath = Path.Combine(Constants.Project.Angular, "src", "app");
+            var angularAppPath = Path.Combine(Constants.Project.Angular, "src", "app", _itemTemplate.SafeItemName.ToLower());
             MoveFile($"{_itemTemplate.EntityCamelCase}-routing.module.ts", angularAppPath, isUI: true);
             MoveFile($"{_itemTemplate.EntityCamelCase}.component.scss", angularAppPath, isUI: true);
             MoveFile($"{_itemTemplate.EntityCamelCase}.component.html", angularAppPath, isUI: true);
@@ -426,12 +427,21 @@ namespace AbpCrudTemplate
                 var updatedText = new StringBuilder();
                 var positionText = @"""Welcome"": ""Welcome"",";
 
-                updatedText.AppendLine(positionText)
-                           .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}"": ""{_itemTemplate.PluralEntityName}"",")
+                updatedText.AppendLine(positionText);
+                if (_shouldGenerateAngularFiles)
+                {
+                    updatedText.Append("\t\t").AppendLine($@"""Menu:{_itemTemplate.SafeItemName}"": ""{_itemTemplate.SafeItemName}"",");
+                }
+                updatedText.Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}"": ""{_itemTemplate.PluralEntityName}"",")
                            .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Create"": ""Create"",")
                            .Append("\t\t").AppendLine($@"""Permission:{_itemTemplate.PluralEntityName}.Edit"": ""Edit"",")
                            .Append("\t\t").Append($@"""Permission:{_itemTemplate.PluralEntityName}.Delete"": ""Delete"",");
-
+                if (_shouldGenerateAngularFiles)
+                {
+                    updatedText.Append("\t\t").AppendLine($@"""{_itemTemplate.SafeItemName}Created"": ""{_itemTemplate.SafeItemName} Created"",");
+                    updatedText.Append("\t\t").AppendLine($@"""{_itemTemplate.SafeItemName}Updated"": ""{_itemTemplate.SafeItemName} Updated"",");
+                    updatedText.Append("\t\t").AppendLine($@"""{_itemTemplate.SafeItemName}Deleted"": ""{_itemTemplate.SafeItemName} Deleted"",");
+                }
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
         }
@@ -444,9 +454,30 @@ namespace AbpCrudTemplate
                 var updatedText = new StringBuilder();
                 var positionText = @"];";
 
-                updatedText.AppendLine(", {path: routeUrl." + _itemTemplate.SafeItemName.ToUpper() + ", loadChildren: () => import('./" + _itemTemplate.EntityCamelCase + "/" + _itemTemplate.EntityCamelCase + ".module').then(m => m." + _itemTemplate.SafeItemName + "Module)}")
+                updatedText.Append("\t").AppendLine("{ path: '" + _itemTemplate.PluralEntityName.ToLower() + "', loadChildren: () => import('./" + _itemTemplate.EntityCamelCase + "/" + _itemTemplate.EntityCamelCase + ".module').then(m => m." + _itemTemplate.SafeItemName + "Module) },")
                            .Append("\t")
                            .AppendLine(positionText);
+
+                return fileText.ToString().Replace(positionText, updatedText.ToString());
+            });
+        }
+        private void UpdateUIRouteProvider()
+        {
+            var filePath = Path.Combine(_itemTemplate.ProjectDirectory, Constants.Project.Angular, "src", "app", $"route.provider.ts");
+
+            UpdateFile(filePath, fileText =>
+            {
+                var updatedText = new StringBuilder();
+                var positionText = @"]);";
+
+                updatedText.Append("\t\t\t").AppendLine("{")
+                           .Append("\t\t\t\t").AppendLine($"path: '{_itemTemplate.PluralEntityName.ToLower()}',")
+                           .Append("\t\t\t\t").AppendLine($"name: '::Menu:{_itemTemplate.SafeItemName}',")
+                           .Append("\t\t\t\t").AppendLine("iconClass: 'fas fa-file-alt',")
+                           .Append("\t\t\t\t").AppendLine("order: 2,")
+                           .Append("\t\t\t\t").AppendLine("layout: eLayoutType.application,")
+                           .Append("\t\t\t").AppendLine("},")
+                           .Append("\t\t").AppendLine(positionText);
 
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });
