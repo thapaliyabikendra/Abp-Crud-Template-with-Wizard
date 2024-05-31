@@ -337,6 +337,7 @@ namespace AbpCrudTemplate
         {
             replacementsDictionary["$appname$"] = _itemTemplate.AppName;
             replacementsDictionary["$appnamecamelcase$"] = _itemTemplate.AppNameCamelCase;
+            replacementsDictionary["$entityname$"] = _itemTemplate.SafeItemName;
             replacementsDictionary["$entitycamelcase$"] = _itemTemplate.EntityCamelCase;
             replacementsDictionary["$pluralentityname$"] = _itemTemplate.PluralEntityName;
             replacementsDictionary["$pluralcamelcaseentityname$"] = _itemTemplate.PluralEntityCamelCase;
@@ -455,7 +456,6 @@ namespace AbpCrudTemplate
                 var positionText = @"];";
 
                 updatedText.Append("\t").AppendLine("{ path: '" + _itemTemplate.PluralEntityName.ToLower() + "', loadChildren: () => import('./" + _itemTemplate.EntityCamelCase + "/" + _itemTemplate.EntityCamelCase + ".module').then(m => m." + _itemTemplate.SafeItemName + "Module) },")
-                           .Append("\t")
                            .AppendLine(positionText);
 
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
@@ -477,7 +477,7 @@ namespace AbpCrudTemplate
                            .Append("\t\t\t\t").AppendLine("order: 2,")
                            .Append("\t\t\t\t").AppendLine("layout: eLayoutType.application,")
                            .Append("\t\t\t").AppendLine("},")
-                           .Append("\t\t").AppendLine(positionText);
+                           .Append(positionText);
 
                 return fileText.ToString().Replace(positionText, updatedText.ToString());
             });

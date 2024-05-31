@@ -29,7 +29,7 @@
     <div class="row align-items-center">
       <div class="col col-md-6">
         <h5 class="card-title">
-          {{ '::Menu:$safeitemname$s' | abpLocalization }}
+          {{ '::Menu:$safeitemname$' | abpLocalization }}
         </h5>
       </div>
       <div class="text-end col col-md-6">

@@ -32,6 +32,7 @@
 
 		<CustomParameters>
 			<CustomParameter Name="$appname$" Value=""/>
+			<CustomParameter Name="$entityname$" Value=""/>
 			<CustomParameter Name="$entitycamelcase$" Value=""/>
 			<CustomParameter Name="$pluralentityname$" Value=""/>
 			<CustomParameter Name="$pluralcamelcaseentityname$" Value=""/>
